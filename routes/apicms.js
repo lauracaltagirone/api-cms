@@ -8,6 +8,10 @@ const path = require('path');
 var hbs = require('express-handlebars');
 const gfs = require('get-folder-size');
 const uuidv1 = require('uuid/v1');
+var generator = require('generate-password');
+const bcrypt = require('bcrypt-nodejs');
+
+
 
 
 var whitelist = [undefined, 'http://localhost:8000', 'http://localhost:3000', 'http://mybrand.pitchprototypes.eu']
@@ -25,24 +29,46 @@ var corsOptions = {
 router.get('/apis-manager', isLoggedInAndCMSAdmin, (req, res) => {
 
     let projects = [];
-    req.user.projects.filter((project) => {
-        projects.push(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${project}/project.json`)));
-    });
+    let users = [];
+    if(req.user.role === "cmsSuperAdmin"){
+      fse.readJsonSync(path.join(req.rootPath, `api-cms-db/projects-list.json`)).list.filter((project) => {
+          projects.push(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${project}/project.json`)));
+      });
+      users = fse.readJsonSync(path.join(req.rootPath, `users.json`));
+    } else {
+      req.user.projects.filter((project) => {
+          projects.push(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${project}/project.json`)));
+      });
+    }
     projects.filter((project) => {
-        let size = ((fsUtils.fsizeSync(path.join(req.rootPath,`api-cms-db/${project.name}`))) / 1024 / 1024).toFixed(2);
+        let size = ((fsUtils.fsizeSync(path.join(req.rootPath,`api-cms-db/${project.id}`))) / 1024 / 1024).toFixed(2);
         project.percentage = (size/project.maxSize) *100;
         project.size = size;
         project.list.filter((api) => {
           api.versions.forEach((version, index) => {
-            let json = fse.readJsonSync(path.join(req.rootPath,`api-cms-db/${project.name}/${api.id}/${version.version}.json`));
+            let json = fse.readJsonSync(path.join(req.rootPath,`api-cms-db/${project.id}/${api.id}/${version.version}.json`));
             version.json = JSON.stringify(json);
           })
         });
     });
 
-    res.render('api-cms/main', {projects, layout: "basic-bootstrap", user: req.user})
+    res.render('api-cms/main', {projects, users, layout: "basic-bootstrap", user: req.user})
 
 });
+
+router.get('/get-project-users/:projectid', isLoggedInAndCMSAdmin,  (req, res) => {
+  let users = fse.readJsonSync(path.join(req.rootPath, `users.json`));
+  let activeUsers = [];
+  users.filter((user) => {
+    user.projects.filter((project) => {
+      if(project === req.params.projectid){
+        activeUsers.push(user);
+      }
+    });
+  });
+  res.send(activeUsers);
+});
+
 
 router.get('/apis/:project/:api', cors(corsOptions), (req, res) => {
   let api_id = req.params.api;
@@ -214,9 +240,101 @@ router.post('/update-version-json', isLoggedInAndCMSAdmin, (req, res) => {
 });
 
 
+router.get('/add-user/:email', isLoggedInAndCmsSuperAdmin, (req, res) => {
+  let users = fse.readJsonSync(path.join(req.rootPath, `users.json`));
+  let unique = uuidv1();
+  let email = req.params.email
+
+  users.push({
+    "id" : unique,
+    "name" : "Random",
+    "surname" : "Lama",
+    "email" : email,
+    "password" : "",
+    "role" : "cmsAdmin",
+    "projects" : []
+  });
+
+  fse.outputFileSync(path.join(req.rootPath, `users.json`), JSON.stringify(users));
+
+  res.send(email);
+
+});
+
+router.get('/add-project/:name', isLoggedInAndCMSAdmin,  (req, res) => {
+    let projects =  fse.readJsonSync(path.join(req.rootPath, `api-cms-db/projects-list.json`));
+    let name = req.params.name;
+    let randomHash = uuidv1();
+    let project = {
+      "name": name,
+      "id": randomHash,
+      "description": `This is Project ${name}`,
+      "maxSize": 10,
+      "list": []
+    }
+    projects.list.push(randomHash);
+    fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${randomHash}/project.json`), JSON.stringify(project));
+    fse.outputFileSync(path.join(req.rootPath, `api-cms-db/projects-list.json`), JSON.stringify(projects));
+
+    res.send(randomHash);
+});
+
+router.post('/enable-user', isLoggedInAndCMSAdmin,  (req, res) => {
+
+    let userid = req.body.userid;
+    let projectid = req.body.projectid;
+    let status = req.body.status;
+    let password = generator.generate({
+      length: 10,
+      numbers: true
+    });
+    let users =  fse.readJsonSync(path.join(req.rootPath, `users.json`));
+    let project = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${projectid}/project.json`));
+
+
+    users.filter((user) => {
+      if(user.id === userid){
+        if(status === false){
+          user.projects.push(projectid);
+          project.users.push(userid);
+          if(user.projects.length === 1){
+            // TODO: sendUser Notification and password
+            user.password = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+          } else{
+            // TODO: sendUser Notification
+          }
+        } else {
+          user.projects =  user.projects.filter(e => e !== projectid);
+          project.users = project.users.filter(e => e !== userid);
+          if(user.projects.length === 0){
+            user.password = "";
+            // TODO: send User Notification and password deleted
+          } else {
+            // TODO: sendUser Notification
+          }
+        }
+      }
+    });
+
+
+    fse.outputFileSync(path.join(req.rootPath, `users.json`), JSON.stringify(users));
+    fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${projectid}/project.json`), JSON.stringify(project));
+
+    res.send(password);
+});
+
 function isLoggedInAndCMSAdmin(req, res, next) {
   // if user is authenticated in the session, carry on
   if (req.isAuthenticated() && ((req.user.role === 'cmsAdmin') || (req.user.role === 'cmsSuperAdmin')))
+    return next();
+
+  // if they aren't redirect them to the home page
+  res.redirect('/');
+}
+
+function isLoggedInAndCmsSuperAdmin(req, res, next){
+  // if user is authenticated in the session, carry on
+  if (req.isAuthenticated() && req.user.role === 'cmsSuperAdmin')
     return next();
 
   // if they aren't redirect them to the home page

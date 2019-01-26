@@ -135,6 +135,61 @@ var app = {
         alert("Not a valid JSON");
     }
   },
+  addUser(){
+    $("#add-user").modal();
+  },
+  addUserConfirm(context){
+    let email = $("#email").val();
+    $.get(`/apicms/add-user/${email}`, (data) => {
+      alert(data);
+      setTimeout(function(){ window.location.reload() }, 500);
+    });
+  },
+  addProject(){
+    $("#add-project").modal();
+  },
+  addProjectConfirm(){
+    let name = $("#project-name").val();
+    $.get(`/apicms/add-project/${name}`, (data) => {
+      setTimeout(function(){ window.location.reload() }, 500);
+    });
+  },
+  manageUsers(context){
+    let projectid = $(context).data("id");
+    $.get(`/apicms/get-project-users/${projectid}`, (users) => {
+      $("#active-users").html("");
+      app.buildManageUsers(users, projectid);
+    });
+
+    $("#manage-users").modal()
+  },
+  removeUserFromProject(context){
+    let userid = $(context).data("userid");
+    let projectid = $(context).data("projectid");
+    $.post( "/apicms/enable-user", { userid, projectid, status: false})
+    .done(function() {
+      $.get(`/apicms/get-project-users/${projectid}`, (users) => {
+        $("#active-users").html("");
+        app.buildManageUsers(users, projectid);
+      });
+    });
+  },
+  buildManageUsers(users, projectid){
+    if(users.length){
+      users.filter((user) => {
+        $("#active-users").append(`<div class="active-user">
+        <b>${user.name} ${user.surname}</b>
+        <br>
+        <span>${user.email}</span>
+        <br>
+        <br>
+        <button class="btn btn-success btn-xs" data-userid="${user.id}" data-projectid="${projectid}" onclick="app.removeUserFromProject(this)"><span class="glyphicon glyphicon-remove"></span> Remove</button>
+        </div>`)
+      });
+    }else {
+      $("#active-users").html("<i>No users for this Project</i>");
+    }
+  },
   ajaxReq: 'ToCancelPrevReq',
   buildApisMarkup(data){
     if(data.data.list.length){

@@ -104,17 +104,14 @@ module.exports = function(passport) {
       users.forEach((user, index) => {
         if(user.email === email){
           userExists = true;
-        }
-        if(index === users.length -1){
-          if(!userExists){
-            return done(null, false, req.flash('loginMessage', 'No user found'));
-          } else {
-            if(bcrypt.compareSync(password, user.password)){
-              return done(null, user);
-            } else{
-              return done(null, false, req.flash('loginMessage', 'Wrong Password'));
-            }
+          if(bcrypt.compareSync(password, user.password)){
+            return done(null, user);
+          } else{
+            return done(null, false, req.flash('loginMessage', 'Wrong Password'));
           }
+        }
+        if(index === users.length -1 && !userExists){
+          return done(null, false, req.flash('loginMessage', 'No user found'));
         }
       });
     }));
