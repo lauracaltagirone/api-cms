@@ -1,1 +1,9 @@
-[{"id":"47997610-1ffc-11e9-bc04-97fe84a2b63a","name":"Andrei","surname":"Zoitanu","email":"a.zoitanu@reply.it","password":"$2a$08$1y3WvSTeg41SN4H9hqJ2f.mGyYupujdqYLm1N6GVjZpMDdU7wzsJG","role":"cmsSuperAdmin","projects":["Project1","Project2"]},{"id":"6a802af0-20fd-11e9-9796-abd1255256a3","name":"Random","surname":"Lama","email":"ciao@aa.com","password":"","role":"cmsAdmin","projects":[]}]
+[{
+  "id": "47997610-1ffc-11e9-bc04-97fe84a2b63a",
+  "name": "Super",
+  "surname": "User",
+  "email": "acz@super-user.it",
+  "password": "$2a$08$1y3WvSTeg41SN4H9hqJ2f.mGyYupujdqYLm1N6GVjZpMDdU7wzsJG",
+  "role": "cmsSuperAdmin",
+  "projects": []
+}]
