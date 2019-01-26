@@ -223,7 +223,7 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
                   {{/each}}
                   <div class="tab-content">
                     {{#each api.versions as |version|}}
-                      <div id="{{project.name}}_{{api.id}}_{{version.version}}" class="tab-pane fade in {{#if (equals api.active_version version.version)}}active{{/if}}">
+                      <div id="{{project.id}}_{{api.id}}_{{version.version}}" class="tab-pane fade in {{#if (equals api.active_version version.version)}}active{{/if}}">
 
                         <div class="form-group">
                           <label for="comment">JSON:</label>
