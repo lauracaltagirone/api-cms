@@ -1,0 +1,52 @@
+{{#each data.list as |api|}}
+  <div class="api {{api.name}}">
+    <div class="qrcode" data-path="apicms/{{api.name}}">
+
+    </div>
+    <div class="">
+      <div class="api-tags">
+        {{#each api.tags as |tag|}}
+          <div class="tag" style="border: 2px solid {{getColorFromString tag}}">
+            {{tag}}
+          </div>
+        {{/each}}
+      </div>
+      <a data-toggle="collapse" href="#{{api.name}}"><h3>{{api.name}}</h3></a>
+      {{#unless api.versions}}
+      <span>This API has no versions yet.</span>
+      {{/unless}}
+      <div class="collapse" id="{{api.name}}">
+        <ul class="nav nav-pills">
+          {{#each api.versions as |version|}}
+            <li class="{{#if (equals api.active_version version.version)}}active{{/if}}"><a data-toggle="tab" href="#{{api.name}}_{{version.version}}">{{api.name}} {{version.version}}</a></li>
+          {{/each}}
+            <div class="tab-content">
+              {{#each api.versions as |version|}}
+                <div id="{{api.name}}_{{version.version}}" class="tab-pane fade in {{#if (equals api.active_version version.version)}}active{{/if}}">
+
+                  <div class="form-group">
+                    <label for="comment">JSON:</label>
+                    <textarea class="form-control" rows="5">{{version.json}}</textarea>
+                  </div>
+                  <div class="checkbox">
+                    <label><input type="checkbox" value="" onchange="app.setActiveVersion(this)" data-api="{{api.name}}" data-version="{{version.version}}" {{#if (equals api.active_version version.version)}}checked{{/if}}>Active</label>
+                  </div>
+                  <button type="button" class="btn btn-default delete-version" data-api="{{api.name}}" data-version="{{version.version}}" onclick="app.deleteVersion(this)">Delete version</button>
+                  <button type="button" class="btn btn-default save-json" data-api="{{api.name}}" data-version="{{version.version}}" onclick="app.saveJSON(this)">Save JSON</button>
+                </div>
+              {{/each}}
+            </div>
+        </ul>
+      </div>
+
+      <br>
+      <a class="active-link" href="/apicms/apis/{{api.name}}" target="_blank"><span class="glyphicon glyphicon glyphicon-link"></span> Go to API</a>
+      <a class="active-link" href="#" role="button" data-remove="{{api.name}}" onclick="app.deleteAPI(this)"><span class="glyphicon glyphicon glyphicon-remove"></span> Delete API</a>
+      <a class="active-link" href="#" role="button" data-api="{{api.name}}" onclick="app.addVersion(this)"><span class="glyphicon glyphicon glyphicon-plus"></span> Add version</a>
+      <a class="active-link" href="#" role="button" data-api="{{api.name}}" data-old-name="{{api.name}}" data-tags="{{tagsToString api.tags}}" onclick="app.editAPI(this)"><span class="glyphicon glyphicon glyphicon-edit"></span> Edit API</a>
+
+    </div>
+  </div>
+
+  <br>
+{{/each}}

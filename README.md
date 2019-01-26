@@ -1,1 +1,1 @@
-# lazy-client
+# acz-core
