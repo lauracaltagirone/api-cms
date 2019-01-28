@@ -1,15 +1,9 @@
 <style media="screen">
-a.white{
-  color: #fff;
-}
+
 body,html{
   height: 100%;
 }
-body{
-  background: linear-gradient(-135deg, #50c8be, #99d041);
-}margin-top: 5px;
-text-align: right;
-}
+
 .progress {
 height: 5px;
 margin: 0;
@@ -256,6 +250,8 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
           <span>No APIS found. Create one by pressing "Add New".</span>
         {{/unless}}
       </div>
+      <br>
+      <br>
       <a class="active-link" href="#" data-project="{{project.id}}" onclick="app.addApi(this)"><span class="glyphicon glyphicon glyphicon-plus"></span> Add API</a>
       {{#if (equals ../user.role "cmsSuperAdmin")}}
         <a class="active-link" href="#" data-id="{{project.id}}" onclick="app.manageUsers(this)"><span class="glyphicon glyphicon glyphicon-edit"></span> Manage users</a>
@@ -479,6 +475,10 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
         <div id="search-and-add">
           <label for="project-name">Search and add</label>
           <input type="text" class="form-control" name="search-user-email" id="search-user-email" placeholder="Search and add" aria-describedby="basic-addon1">
+        </div>
+        <br>
+        <div id="search-users">
+
         </div>
         <br>
         <hr>
