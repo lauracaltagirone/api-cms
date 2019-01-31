@@ -152,8 +152,8 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
   {{#if (equals user.role "cmsSuperAdmin")}}
     <br />
     <br />
-    <a class="active-link white" href="#" onclick="app.addProject()"><span class="glyphicon glyphicon glyphicon-plus"></span> ADD PROJECT</a>
-    <a class="active-link white" href="#" onclick="app.addUser()"><span class="glyphicon glyphicon glyphicon-plus"></span> ADD USER</a>
+    <a class="active-link white" href="#" onclick="admin.addProject()"><span class="glyphicon glyphicon glyphicon-plus"></span> ADD PROJECT</a>
+    <a class="active-link white" href="#" onclick="admin.addUser()"><span class="glyphicon glyphicon glyphicon-plus"></span> ADD USER</a>
 
   {{/if}}
   <br />
@@ -255,7 +255,7 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
       <br>
       <a class="active-link" href="#" data-project="{{project.id}}" onclick="app.addApi(this)"><span class="glyphicon glyphicon glyphicon-plus"></span> Add API</a>
       {{#if (equals ../user.role "cmsSuperAdmin")}}
-        <a class="active-link" href="#" data-id="{{project.id}}" onclick="app.manageUsers(this)"><span class="glyphicon glyphicon glyphicon-edit"></span> Manage users</a>
+        <a class="active-link" href="#" data-id="{{project.id}}" onclick="admin.manageUsers(this)"><span class="glyphicon glyphicon glyphicon-edit"></span> Manage users</a>
       {{/if}}
     </div>
   {{/each}}
@@ -432,7 +432,7 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="add-user-confirm" onclick="app.addUserConfirm(this)">Add</button>
+        <button type="button" class="btn btn-primary" id="add-user-confirm" onclick="admin.addUserConfirm(this)">Add</button>
       </div>
     </div>
     <!-- /.modal-content -->
@@ -456,7 +456,7 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="add-user-confirm" onclick="app.addProjectConfirm(this)">Add</button>
+        <button type="button" class="btn btn-primary" id="add-user-confirm" onclick="admin.addProjectConfirm(this)">Add</button>
       </div>
     </div>
     <!-- /.modal-content -->
@@ -489,7 +489,7 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="add-user-confirm" onclick="app.addProjectConfirm(this)">Add</button>
+        <button type="button" class="btn btn-primary" id="add-user-confirm" onclick="admin.addProjectConfirm(this)">Add</button>
       </div>
     </div>
     <!-- /.modal-content -->
@@ -502,4 +502,6 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
 
 <script type="text/javascript" src="/jquery/jquery.qrcode.js" defer></script>
 <script type="text/javascript" src="/handlebars/handlebars.js" defer></script>
-<script type="text/javascript" src="/js/cmsAdmin/main.js" defer></script>
+{{#if (equals user.role "cmsSuperAdmin")}}
+  <script type="text/javascript" src="/js/cmsAdmin/admin.js" defer></script>
+{{/if}}
