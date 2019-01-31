@@ -365,7 +365,7 @@ router.get('/search-users/:projectId/:term', isLoggedInAndCMSAdmin,  (req, res) 
     let projectId = req.params.projectId;
 
     res.send(users.filter((user) => {
-      return user.email.includes(term);
+      return user.email.includes(term) && user.role === "cmsAdmin";
     }));
 });
 
