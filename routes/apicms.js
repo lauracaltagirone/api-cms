@@ -10,8 +10,15 @@ const gfs = require('get-folder-size');
 const uuidv1 = require('uuid/v1');
 var generator = require('generate-password');
 const bcrypt = require('bcrypt-nodejs');
+const nodemailer = require('nodemailer');
 
-
+var transporter = nodemailer.createTransport({
+ service: 'gmail',
+ auth: {
+        user: process.env.GMAIL,
+        pass: process.env.GMAIL_PASSWORD
+    }
+});
 
 
 var whitelist = [undefined, 'http://localhost:8000', 'http://localhost:3000', 'http://mybrand.pitchprototypes.eu']
@@ -270,7 +277,8 @@ router.get('/add-project/:name', isLoggedInAndCMSAdmin,  (req, res) => {
       "id": randomHash,
       "description": `This is Project ${name}`,
       "maxSize": 10,
-      "list": []
+      "list": [],
+      "users": []
     }
     projects.list.push(randomHash);
     fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${randomHash}/project.json`), JSON.stringify(project));
@@ -290,29 +298,57 @@ router.post('/enable-user', isLoggedInAndCMSAdmin,  (req, res) => {
     });
     let users =  fse.readJsonSync(path.join(req.rootPath, `users.json`));
     let project = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${projectid}/project.json`));
-
+    var mailOptions = {}
 
     users.filter((user) => {
       if(user.id === userid){
-        if(status === false){
+        if(status === 'true'){
           user.projects.push(projectid);
           project.users.push(userid);
           if(user.projects.length === 1){
-            // TODO: sendUser Notification and password
-            user.password = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+            mailOptions = {
+              from: 'iamadumbmailer@gmail.com', // sender address
+              to: user.email, // list of receivers
+              subject: 'APICMS - WELCOME', // Subject line
+              html: `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been added to ${project.name} project. <br>Please Login at <a href="https://api.acz-core.com">https://api.acz-core.com</a> `// plain text body
+            };
+            if(user.password === null || user.password === undefined || !user.password.length){
+              user.password = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+              mailOptions.html = `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been added to ${project.name} project. <br>Please Login at <a href="https://api.acz-core.com">https://api.acz-core.com</a> with following credentials:<br> <b>Email:</b>${user.email}<br><b>Password:</b> ${password}`;
+            }
           } else{
-            // TODO: sendUser Notification
+            mailOptions = {
+              from: 'iamadumbmailer@gmail.com', // sender address
+              to: user.email, // list of receivers
+              subject: 'APICMS - WELCOME', // Subject line
+              html: `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been added to ${project.name} project. <br>Please Login at <a href="https://api.acz-core.com">https://api.acz-core.com</a>`// plain text body
+            };
           }
         } else {
           user.projects =  user.projects.filter(e => e !== projectid);
           project.users = project.users.filter(e => e !== userid);
           if(user.projects.length === 0){
-            user.password = "";
-            // TODO: send User Notification and password deleted
+            mailOptions = {
+              from: 'iamadumbmailer@gmail.com', // sender address
+              to: user.email, // list of receivers
+              subject: 'APICMS - WELCOME', // Subject line
+              html: `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been removed from ${project.name} project. <br>`// plain text body
+            };
           } else {
-            // TODO: sendUser Notification
+            mailOptions = {
+              from: 'iamadumbmailer@gmail.com', // sender address
+              to: user.email, // list of receivers
+              subject: 'APICMS - WELCOME', // Subject line
+              html: `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been removed from ${project.name} project. <br>`// plain text body
+            };
           }
         }
+        transporter.sendMail(mailOptions, function (err, info) {
+           if(err)
+             console.log(err)
+           else
+             console.log(info);
+        });
       }
     });
 
@@ -321,6 +357,16 @@ router.post('/enable-user', isLoggedInAndCMSAdmin,  (req, res) => {
     fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${projectid}/project.json`), JSON.stringify(project));
 
     res.send(password);
+});
+
+router.get('/search-users/:projectId/:term', isLoggedInAndCMSAdmin,  (req, res) => {
+    let users = fse.readJsonSync(path.join(req.rootPath, `users.json`));
+    let term = req.params.term;
+    let projectId = req.params.projectId;
+
+    res.send(users.filter((user) => {
+      return user.email.includes(term);
+    }));
 });
 
 function isLoggedInAndCMSAdmin(req, res, next) {

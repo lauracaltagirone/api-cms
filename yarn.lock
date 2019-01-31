@@ -1276,7 +1276,6 @@ gaze@^1.0.0:
 generate-password@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/generate-password/-/generate-password-1.4.1.tgz#33ab0f004d3adbde6c63bfc8bb9798da2a848174"
-  integrity sha512-MwMSkOIKkgYBG3JrquF0m/Rky+pl5jZFNmoroE9bQU5VawFDKdJfxMx1qBthPusx8GQyNWSW0m+Jaw0mZnqApg==
 
 genfun@^5.0.0:
   version "5.0.0"
@@ -2536,6 +2535,10 @@ nodejs-fs-utils@^1.1.2:
   resolved "https://registry.yarnpkg.com/nodejs-fs-utils/-/nodejs-fs-utils-1.1.2.tgz#bcde2ee061d581413b8b5430b71215adfaaa82e2"
   dependencies:
     module-require "*"
+
+nodemailer@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-5.1.1.tgz#0c48d1ecab02e86d9ff6c620ee75ed944b763505"
 
 "nopt@2 || 3":
   version "3.0.6"

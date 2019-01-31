@@ -156,6 +156,7 @@ var app = {
   },
   manageUsers(context){
     let projectid = $(context).data("id");
+    $("#manage-users").data("projectId", projectid)
     $.get(`/apicms/get-project-users/${projectid}`, (users) => {
       $("#active-users").html("");
       app.buildManageUsers(users, projectid);
@@ -170,6 +171,20 @@ var app = {
     .done(function() {
       $.get(`/apicms/get-project-users/${projectid}`, (users) => {
         $("#active-users").html("");
+        $("#search-users").html("");
+        app.buildManageUsers(users, projectid);
+      });
+    });
+  },
+  enableUser(context){
+    let userid = $(context).data("userid");
+    let projectid = $(context).data("projectid");
+    $.post( "/apicms/enable-user", { userid, projectid, status: true})
+    .done(function() {
+      $.get(`/apicms/get-project-users/${projectid}`, (users) => {
+        $("#active-users").html("");
+        $("#search-users").html("");
+
         app.buildManageUsers(users, projectid);
       });
     });
@@ -190,6 +205,33 @@ var app = {
       $("#active-users").html("<i>No users for this Project</i>");
     }
   },
+  buildManageUsersSearch(users, projectid){
+    if(users.length){
+      users.filter((user) => {
+        if(user.projects.includes(projectid)){
+          $("#search-users").append(`<div class="active-user">
+          <b>${user.name} ${user.surname}</b>
+          <br>
+          <span>${user.email}</span>
+          <br>
+          <br>
+          <button class="btn btn-success btn-xs" data-userid="${user.id}" data-projectid="${projectid}" onclick="app.removeUserFromProject(this)"><span class="glyphicon glyphicon-remove"></span> Remove</button>
+          </div>`)
+        } else{
+          $("#search-users").append(`<div class="active-user">
+          <b>${user.name} ${user.surname}</b>
+          <br>
+          <span>${user.email}</span>
+          <br>
+          <br>
+          <button class="btn btn-success btn-xs" data-userid="${user.id}" data-projectid="${projectid}" onclick="app.enableUser(this)"><span class="glyphicon glyphicon-plus"></span> Enable</button>
+          </div>`)
+        }
+      });
+    }else {
+      $("#search-users").html("<i>No users found</i>");
+    }
+  },
   ajaxReq: 'ToCancelPrevReq',
   buildApisMarkup(data){
     if(data.data.list.length){
@@ -208,37 +250,30 @@ var app = {
   }
 }
 
-$(".search").keyup(function() {
-  $("#apis").html('');
+$(".search-users").keyup(function() {
+  let projectId = $("#manage-users").data("projectId");
+  $("#search-users").html('');
   let term = $(this).val();
-  let url = `/apicms/search-by-${$(this).data("search")}/${term}`
+  let url = `/apicms/search-users/${projectId}/${term}`
   if (term.length > 2) {
-    $("#apis").html('<div id="search-loading">Searching...</div>');
+    $("#search-users").html('<div id="search-loading">Searching...</div>');
     app.ajaxReq = $.ajax({
       url,
       type: 'GET',
-      beforeSend: function() {
+      beforeSend: () => {
         if (app.ajaxReq != 'ToCancelPrevReq' && app.ajaxReq.readyState < 4) {
           app.ajaxReq.abort();
         }
       },
-      success: function(data) {
-        app.buildApisMarkup(data);
+      success: (users) => {
+        $("#search-users").html('');
+        app.buildManageUsersSearch(users, projectId);
       },
       error: function(xhr, ajaxOptions, thrownError) {
         if (thrownError == 'abort' || thrownError == 'undefined') return;
         alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
       }
     }); //end app.ajaxReq
-
-  }else{
-    if(term.length === 0){
-      $.get(`/apicms/get-all-apis`, (data) => {
-        app.buildApisMarkup(data)
-      });
-    } else {
-      $("#apis").html('Please enter minimum 3 letters.');
-    }
 
   }
 
