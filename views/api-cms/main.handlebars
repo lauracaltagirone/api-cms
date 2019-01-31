@@ -179,7 +179,7 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
   {{#each projects as |project|}}
 
     <div class="project">
-      <a href="#{{project.name}}" data-toggle="collapse">
+      <a href="#{{project.id}}" data-toggle="collapse">
         <h2>{{project.name}}</h2>
       </a>
       <i>{{project.description}}</i>
@@ -190,7 +190,7 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
         </div>
       </div>
       <p class="progress-info">{{project.size}} MB / {{project.maxSize}} MB Used</p>
-      <div class="apis collapse" id="{{project.name}}">
+      <div class="apis collapse" id="{{project.id}}">
         {{#each project.list as |api|}}
 
           <div class="api {{api.id}}">
