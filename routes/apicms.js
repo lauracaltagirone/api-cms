@@ -90,7 +90,7 @@ router.get('/apis/:project/:api', cors(corsOptions), (req, res) => {
   if(active_version === ""){
     res.send("Thsi API doesn't have an active version.");
   } else{
-    setTimeout(function(){ res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`))); }, 20000);
+    res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
   }
 });
 
