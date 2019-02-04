@@ -103,7 +103,13 @@ router.get('/apis/:project/:api', cors(corsOptions), (req, res) => {
       if (httpStatus.includes(status)){
         res.status(status);
       }
-      res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+      try {
+        res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+      }
+      catch(err) {
+        res.status(404);
+        res.send("Thsi API doesn't exist.");
+      }
     }, delay);
 
   }
@@ -125,7 +131,7 @@ router.post('/apis/:project/:api', cors(corsOptions), (req, res) => {
   });
 
   delay = delay === undefined || delay === null ? 0 : delay;
-  let response = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`));
+
   if(active_version === ""){
     res.send("Thsi API doesn't have an active version.");
   } else{
@@ -133,8 +139,15 @@ router.post('/apis/:project/:api', cors(corsOptions), (req, res) => {
       if (httpStatus.includes(status)){
         res.status(status);
       }
-      res.send(response);
+      try {
+        res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+      }
+      catch(err) {
+        res.status(404);
+        res.send("Thsi API doesn't exist.");
+      }
     }, delay);
+
   }
 });
 
