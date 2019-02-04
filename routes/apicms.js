@@ -12,6 +12,8 @@ var generator = require('generate-password');
 const bcrypt = require('bcrypt-nodejs');
 const nodemailer = require('nodemailer');
 
+const httpStatus = [100,101,102,200,201,202,203,204,205,206,207,208,226,300,301,302,303,304,305,307,308,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,421,422,423,424,426,428,429,431,444,451,499,500,501,502,503,504,505,506,507,508,510,511,59];
+
 var transporter = nodemailer.createTransport({
  service: 'gmail',
  auth: {
@@ -82,15 +84,28 @@ router.get('/apis/:project/:api', cors(corsOptions), (req, res) => {
   let project = req.params.project;
   let apis = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${project}/project.json`));
   let active_version;
+  let delay;
+  let status;
   apis.list.filter((api) => {
     if(api.id === api_id){
       active_version = api.active_version;
     }
+    delay = api.delay;
+    status = api.status;
   });
+
+  delay = delay === undefined || delay === null ? 0 : delay;
+
   if(active_version === ""){
     res.send("Thsi API doesn't have an active version.");
   } else{
-    res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+    setTimeout(() => {
+      if (httpStatus.includes(status)){
+        res.status(status);
+      }
+      res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+    }, delay);
+
   }
 });
 
@@ -99,17 +114,30 @@ router.post('/apis/:project/:api', cors(corsOptions), (req, res) => {
   let project = req.params.project;
   let apis = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${project}/project.json`));
   let active_version;
+  let delay;
+  let status;
   apis.list.filter((api) => {
     if(api.id === api_id){
       active_version = api.active_version;
     }
+    delay = api.delay;
+    status = api.status;
   });
+
+  delay = delay === undefined || delay === null ? 0 : delay;
+  let response = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`));
   if(active_version === ""){
     res.send("Thsi API doesn't have an active version.");
   } else{
-    res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+    setTimeout(() => {
+      if (httpStatus.includes(status)){
+        res.status(status);
+      }
+      res.send(response);
+    }, delay);
   }
 });
+
 
 router.get('/add-api/:project/:name', isLoggedInAndCMSAdmin,  (req, res) => {
   let data = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/project.json`));
@@ -147,9 +175,11 @@ router.post('/edit-api', isLoggedInAndCMSAdmin, (req, res) => {
     if(api.id === payload.id){
       api.name = payload.name;
       api.id = randomHash;
+      api.status = parseInt(payload.status);
+      api.delay = parseInt(payload.delay);
       if(payload.tags.length){
         api.tags = payload.tags.split(';')
-      } else{
+      } else {
         api.tags = [];
       }
     }

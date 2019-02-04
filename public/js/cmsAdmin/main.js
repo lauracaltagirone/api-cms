@@ -26,21 +26,27 @@ var app = {
   editAPI(context){
     var id = $(context).data("id");
     var tags = $(context).data("tags");
+    var status = $(context).data("status");
+    var delay = $(context).data("delay");
     var oldName = $(context).data("old-name");
     var project = $(context).data("project");
     $("#edit-api-confirm").data("project", project);
     $("#edit-api-confirm").data("id", id);
     $("#edit-api .tags").val(tags);
     $("#edit-api .name").val(oldName);
+    $("#edit-api .status").val(status);
+    $("#edit-api .delay").val(delay);
     $("#edit-api").modal();
   },
   editAPIConfirm(context){
     var name = $("#edit-api .name").val().trim();
     var tags = $("#edit-api .tags").val().split(';').join(';');
+    var status = $("#edit-api .status").val().trim();
+    var delay = $("#edit-api .delay").val().trim();
     var project = $(context).data("project");
     var id = $(context).data("id");
 
-    $.post( "/apicms/edit-api", { project, name, id, tags})
+    $.post( "/apicms/edit-api", { project, name, id, tags, delay, status})
     .done(function( data ) {
       if(data === "alreadExists"){
         alert("API already exists")

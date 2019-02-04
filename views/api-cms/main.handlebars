@@ -239,7 +239,7 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
               <a class="active-link" href="/apicms/apis/{{project.id}}/{{api.id}}" target="_blank"><span class="glyphicon glyphicon glyphicon-link"></span> Go to API</a>
               <a class="active-link" href="#" role="button" data-remove="{{api.id}}" data-project="{{project.id}}" onclick="app.deleteAPI(this)"><span class="glyphicon glyphicon glyphicon-remove"></span> Delete API</a>
               <a class="active-link" href="#" role="button" data-id="{{api.id}}" data-name="{{api.name}}" data-project="{{project.id}}" onclick="app.addVersion(this)"><span class="glyphicon glyphicon glyphicon-plus"></span> Add version</a>
-              <a class="active-link" href="#" role="button" data-project="{{project.id}}" data-id="{{api.id}}" data-old-name="{{api.name}}" data-tags="{{tagsToString api.tags}}" onclick="app.editAPI(this)"><span class="glyphicon glyphicon glyphicon-edit"></span>
+              <a class="active-link" href="#" role="button" data-project="{{project.id}}" data-id="{{api.id}}" data-old-name="{{api.name}}" data-tags="{{tagsToString api.tags}}" data-status="{{api.status}}" data-delay="{{api.delay}}" onclick="app.editAPI(this)"><span class="glyphicon glyphicon glyphicon-edit"></span>
                 Edit API</a>
 
             </div>
@@ -282,6 +282,14 @@ box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
           <label for="tags">TAGS:</label>
           <input type="text" class="form-control tags" name="tags" placeholder="API name" aria-describedby="basic-addon1">
         </div>
+        <div class="form-group">
+            <label for="tags">DELAY(milliseconds):</label>
+            <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control delay" name="delay" placeholder="Delay" aria-describedby="basic-addon1">
+        </div>
+           <div class="form-group">
+              <label for="tags">HTTP status:</label>
+              <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control status" name="status" placeholder="Status" aria-describedby="basic-addon1">
+            </div>
         <input type="hidden" class="form-control old-name" name="tags" placeholder="API name" aria-describedby="basic-addon1">
 
         <br>
