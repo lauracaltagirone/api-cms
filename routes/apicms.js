@@ -182,12 +182,10 @@ router.get('/add-api/:project/:name', isLoggedInAndCMSAdmin,  (req, res) => {
 router.post('/edit-api', isLoggedInAndCMSAdmin, (req, res) => {
   let data = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.body.project}/project.json`));
   let payload = req.body;
-  let randomHash = uuidv1();
 
   data.list.filter((api) => {
     if(api.id === payload.id){
       api.name = payload.name;
-      api.id = randomHash;
       api.status = parseInt(payload.status);
       api.delay = parseInt(payload.delay);
       if(payload.tags.length){
@@ -198,8 +196,6 @@ router.post('/edit-api', isLoggedInAndCMSAdmin, (req, res) => {
     }
   });
 
-  fse.copySync(path.join(req.rootPath, `api-cms-db/${payload.project}/${payload.id}`), path.join(req.rootPath, `api-cms-db/${payload.project}/${randomHash}`));
-  fse.removeSync(path.join(req.rootPath, `api-cms-db/${payload.project}/${payload.id}`));
   fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${payload.project}/project.json`), JSON.stringify(data));
   res.send(req.params.id);
 
