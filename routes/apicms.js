@@ -89,9 +89,9 @@ router.get('/apis/:project/:api', cors(corsOptions), (req, res) => {
   apis.list.filter((api) => {
     if(api.id === api_id){
       active_version = api.active_version;
+      delay = api.delay;
+      status = api.status;
     }
-    delay = api.delay;
-    status = api.status;
   });
 
   delay = delay === undefined || delay === null ? 0 : delay;
@@ -125,9 +125,9 @@ router.post('/apis/:project/:api', cors(corsOptions), (req, res) => {
   apis.list.filter((api) => {
     if(api.id === api_id){
       active_version = api.active_version;
+      delay = api.delay;
+      status = api.status;
     }
-    delay = api.delay;
-    status = api.status;
   });
 
   delay = delay === undefined || delay === null ? 0 : delay;
