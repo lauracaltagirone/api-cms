@@ -349,18 +349,18 @@ router.post('/enable-user', isLoggedInAndCMSAdmin,  (req, res) => {
               from: 'iamadumbmailer@gmail.com', // sender address
               to: user.email, // list of receivers
               subject: 'APICMS - WELCOME', // Subject line
-              html: `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been added to ${project.name} project. <br>Please Login at <a href="https://api.acz-core.com">https://api.acz-core.com</a> `// plain text body
+              html: `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been added to ${project.name} project. <br>Please Login at <a href="www.api.acz-core.com">api.acz-core.com</a> `// plain text body
             };
             if(user.password === null || user.password === undefined || !user.password.length){
               user.password = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-              mailOptions.html = `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been added to ${project.name} project. <br>Please Login at <a href="https://api.acz-core.com">https://api.acz-core.com</a> with following credentials:<br> <b>Email:</b>${user.email}<br><b>Password:</b> ${password}`;
+              mailOptions.html = `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been added to ${project.name} project. <br>Please Login at <a href="www.api.acz-core.com">api.acz-core.com</a> with following credentials:<br> <b>Email:</b>${user.email}<br><b>Password:</b> ${password}`;
             }
           } else{
             mailOptions = {
               from: 'iamadumbmailer@gmail.com', // sender address
               to: user.email, // list of receivers
               subject: 'APICMS - WELCOME', // Subject line
-              html: `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been added to ${project.name} project. <br>Please Login at <a href="https://api.acz-core.com">https://api.acz-core.com</a>`// plain text body
+              html: `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been added to ${project.name} project. <br>Please Login at <a href="www.api.acz-core.com">api.acz-core.com</a>`// plain text body
             };
           }
         } else {
