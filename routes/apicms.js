@@ -138,11 +138,13 @@ router.get('/apis/:project/:api', cors(corsOptions), (req, res) => {
   let active_version;
   let delay;
   let status;
+  let query;
   apis.list.filter((api) => {
     if(api.id === api_id){
       active_version = api.active_version;
       delay = api.delay;
       status = api.status;
+      query = api.query ? api.query : null;
     }
   });
 
@@ -156,7 +158,11 @@ router.get('/apis/:project/:api', cors(corsOptions), (req, res) => {
         res.status(status);
       }
       try {
-        res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+        if(query && req.query[`${query}`]){
+          res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/v${req.query[`${query}`]}.json`)));
+        } else {
+          res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+        }
       }
       catch(err) {
         res.status(404);
@@ -240,6 +246,7 @@ router.post('/edit-api', isLoggedInAndCMSAdmin, (req, res) => {
       api.name = payload.name;
       api.status = parseInt(payload.status);
       api.delay = parseInt(payload.delay);
+      api.query = payload.query;
       if(payload.tags.length){
         api.tags = payload.tags.split(';')
       } else {
