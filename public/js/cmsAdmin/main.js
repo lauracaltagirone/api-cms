@@ -45,7 +45,7 @@ var app = {
     var delay = $("#edit-api .delay").val().trim();
     var project = $(context).data("project");
     var id = $(context).data("id");
-
+    localStorage.setItem("api", `${project}_${id}`);
     $.post( "/apicms/edit-api", { project, name, id, tags, delay, status})
     .done(function( data ) {
       if(data === "alreadExists"){
@@ -100,12 +100,14 @@ var app = {
     } catch (e) {
         alert("Not a valid JSON");
     }
+    localStorage.setItem("api", `${project}_${id}`);
   },
   setActiveVersion(context){
     var id = $(context).data("id");
     var project = $(context).data("project");
     var version = $(context).data("version");
     var checked = context.checked;
+    localStorage.setItem("api", `${project}_${id}`);
     $.get(`/apicms/set-active-version/${project}/${id}/${version}/${checked ? 'checked' : 'unchecked'}`, (data) => {
       setTimeout(function(){ window.location.reload() }, 500);
     });
@@ -123,6 +125,7 @@ var app = {
     var id = $(context).data("id");
     var version = $(context).data("version");
     var project = $(context).data("project");
+    localStorage.setItem("api", `${project}_${id}`);
     $.get(`/apicms/delete-version/${project}/${id}/${version}`, (data) => {
       setTimeout(function(){ window.location.reload() }, 500);
     });
@@ -131,6 +134,7 @@ var app = {
     var id = $(context).data("id");
     var version = $(context).data("version");
     var project = $(context).data("project");
+    localStorage.setItem("api", `${project}_${id}`);
     try {
       var json = JSON.parse($(`#${project}_${id}_${version} textarea`).val());
       $.post( "/apicms/update-version-json", { project, id, version, json: JSON.stringify(json)})
@@ -156,12 +160,52 @@ var app = {
     $( ".qrcode" ).each(function( index, api ) {
       $(api).qrcode({width: 64,height: 64, text: `${window.location.host}/${$(this).data("path")}`});
     });
+  },
+  paginate(project){
+    if(!project){
+      let projects = $(".project");
+      projects.filter((index, project) => {
+        $(project).find(".chunk#tab-1").show();
+        $(project).find(".pagination").twbsPagination({
+          totalPages: parseInt($(project).data("chunks")),
+          visiblePages: 7,
+          onPageClick: function (event, page) {
+            $(project).find(".chunk").hide();
+            $(project).find(`.chunk#tab-${page}`).show();
+          }
+        });
+      });
+    } else {
+      let project_el = $(`.project.${project.id}`);
+      $(project_el).find(".chunk").hide();
+      $(project_el).find(".chunk#tab-1").show();
+      $(project_el).find(".pagination").html("");
+      $(project_el).find(".pagination").twbsPagination('destroy');
+      $(project_el).find(".pagination").twbsPagination({
+        totalPages: project.list.length,
+        visiblePages: 7,
+        onPageClick: function (event, page) {
+          $(project_el).find(".chunk").hide();
+          $(project_el).find(`.chunk#tab-${page}`).show();
+        }
+      });
+    }
+  },
+  buildApisMarkup(data){
+    if(data.data && data.data.project.list[0].length){
+      var source = data.data.template;
+      var template = Handlebars.compile(source);
+      $("#apis").html(template({"project": data.data.project}));
+      app.loadQrCodes();
+      app.paginate(data.data.project);
+      $('.pagination').show();
+    } else {
+      $("#apis").html("No apis found.")
+      $('.pagination').hide();
+    }
   }
 }
 
-$(document).ready(function(){
-  app.loadQrCodes();
-});
 
 Handlebars.registerHelper('equals', function(v1, v2) {
   return v1 === v2;
@@ -189,4 +233,55 @@ Handlebars.registerHelper('getRandomColor', function(){
     color += letters[Math.floor(Math.random() * 16)];
   }
   return color;
+});
+
+Handlebars.registerHelper('inc', function(val){
+  return val+1;
+});
+
+
+$(document).ready(function(){
+  app.loadQrCodes();
+  app.paginate();
+  if(localStorage.getItem("api")){
+    $(`#${localStorage.getItem("api")}`).addClass("in");
+    localStorage.removeItem("api");
+  }
+});
+
+$(".search").keyup(function() {
+  $("#apis").html('');
+  let term = $(this).val();
+  let project = $("#apis").data("project");
+  let url = `/apicms/search-by/${project}/${$(this).data("search")}/${term}`
+  if (term.length > 2) {
+    $("#apis").html('<div id="search-loading">Searching...</div>');
+    app.ajaxReq = $.ajax({
+      url,
+      type: 'GET',
+      beforeSend: function() {
+        if (app.ajaxReq != 'ToCancelPrevReq' && app.ajaxReq.readyState < 4) {
+          app.ajaxReq.abort();
+        }
+      },
+      success: function(data) {
+        app.buildApisMarkup(data);
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        if (thrownError == 'abort' || thrownError == 'undefined') return;
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    }); //end app.ajaxReq
+
+  }else{
+    if(term.length === 0){
+      $.get(`/apicms/get-all-apis/${project}`, (data) => {
+        app.buildApisMarkup(data)
+      });
+    } else {
+      $('.pagination').hide();
+      $("#apis").html('Please enter minimum 3 letters.');
+    }
+
+  }
 });

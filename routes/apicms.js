@@ -53,15 +53,67 @@ router.get('/apis-manager', isLoggedInAndCMSAdmin, (req, res) => {
         let size = ((fsUtils.fsizeSync(path.join(req.rootPath,`api-cms-db/${project.id}`))) / 1024 / 1024).toFixed(2);
         project.percentage = (size/project.maxSize) *100;
         project.size = size;
+        let count = 0;
+        let apis_chunks = [];
+        let apis_chunk = [];
         project.list.filter((api) => {
+          if(count === 3){
+            apis_chunks.push(apis_chunk);
+            apis_chunk = [];
+            count = 0;
+          }
           api.versions.forEach((version, index) => {
             let json = fse.readJsonSync(path.join(req.rootPath,`api-cms-db/${project.id}/${api.id}/${version.version}.json`));
             version.json = JSON.stringify(json);
-          })
+          });
+          apis_chunk.push(api);
+          count++;
         });
+        if(apis_chunk.length && project.list.length >= 4){
+          apis_chunks.push(apis_chunk);
+        }
+        if(project.list.length >= 4){
+          project.list = apis_chunks;
+        } else {
+          project.list = [apis_chunk];
+        }
     });
 
     res.render('api-cms/main', {projects, users, layout: "basic-bootstrap", user: req.user})
+
+});
+
+router.get('/get-all-apis/:project', isLoggedInAndCMSAdmin, (req, res) => {
+
+    let project = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/project.json`));
+    let count = 0;
+    let apis_chunks = [];
+    let apis_chunk = [];
+    project.list.filter((api) => {
+      if(count === 3){
+        apis_chunks.push(apis_chunk);
+        apis_chunk = [];
+        count = 0;
+      }
+      api.versions.forEach((version, index) => {
+        let json = fse.readJsonSync(path.join(req.rootPath,`api-cms-db/${project.id}/${api.id}/${version.version}.json`));
+        version.json = JSON.stringify(json);
+      });
+      apis_chunk.push(api);
+      count++;
+    });
+    if(apis_chunk.length && project.list.length >= 4){
+      apis_chunks.push(apis_chunk);
+    }
+    if(project.list.length >= 4){
+      project.list = apis_chunks;
+    } else {
+      project.list = [apis_chunk];
+    }
+
+    fs.readFile(path.join(req.rootPath,`views/partials/apis.hbs`), 'utf8', (err, data) => {
+      res.send({data: {project, template: data}});
+    });
 
 });
 
@@ -406,6 +458,68 @@ router.get('/search-users/:projectId/:term', isLoggedInAndCMSAdmin,  (req, res) 
     res.send(users.filter((user) => {
       return user.email.includes(term) && user.role === "cmsAdmin";
     }));
+});
+
+router.get('/search-by/:projectId/:what/:term', isLoggedInAndCMSAdmin,  (req, res) => {
+    let what = req.params.what;
+    let project = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.projectId}/project.json`));
+    let filtered_apis = [];
+    let count = 0;
+    let apis_chunks = [];
+    let apis_chunk = [];
+    switch (what) {
+      case 'name':
+        project.list.filter((api) => {
+          if(api.name.includes(req.params.term)){
+            filtered_apis.push(api);
+          }
+        });
+        break;
+      case 'tag':
+          project.list.filter((api) => {
+            api.tags.filter((tag) => {
+              if(tag.includes(req.params.term) && !filtered_apis.includes(api)){
+                filtered_apis.push(api);
+              }
+            });
+          });
+        break;
+
+      case 'hash':
+          project.list.filter((api) => {
+            if(api.id === req.params.term){
+              filtered_apis.push(api);
+            }
+          });
+          break;
+      default:
+
+    }
+    project.list = filtered_apis;
+    project.list.filter((api) => {
+      if(count === 3){
+        apis_chunks.push(apis_chunk);
+        apis_chunk = [];
+        count = 0;
+      }
+      api.versions.forEach((version, index) => {
+        let json = fse.readJsonSync(path.join(req.rootPath,`api-cms-db/${project.id}/${api.id}/${version.version}.json`));
+        version.json = JSON.stringify(json);
+      });
+      apis_chunk.push(api);
+      count++;
+    });
+    if(apis_chunk.length && project.list.length >= 4){
+      apis_chunks.push(apis_chunk);
+    }
+    if(project.list.length >= 4){
+      project.list = apis_chunks;
+    } else {
+      project.list = [apis_chunk];
+    }
+    fs.readFile(path.join(req.rootPath,`views/partials/apis.hbs`), 'utf8', (err, data) => {
+      res.send({data: {project, template: data}});
+    });
 });
 
 function isLoggedInAndCMSAdmin(req, res, next) {

@@ -37,6 +37,9 @@ app.engine('handlebars', exphbs({
     equals: function(v1, v2) {
       return v1 === v2;
     },
+    inc: function(value) {
+      return value+1;
+    },
     tagsToString(tags){
       return tags.join(';');
     },
