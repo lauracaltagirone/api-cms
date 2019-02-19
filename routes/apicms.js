@@ -159,7 +159,7 @@ router.get('/apis/:project/:api', cors(corsOptions), (req, res) => {
       }
       try {
         if(query && req.query[`${query}`]){
-          res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/v${req.query[`${query}`]}.json`)));
+          res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${req.query[`${query}`]}.json`)));
         } else {
           res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
         }
@@ -180,11 +180,13 @@ router.post('/apis/:project/:api', cors(corsOptions), (req, res) => {
   let active_version;
   let delay;
   let status;
+  let query;
   apis.list.filter((api) => {
     if(api.id === api_id){
       active_version = api.active_version;
       delay = api.delay;
       status = api.status;
+      query = api.query ? api.query : null;
     }
   });
 
@@ -198,7 +200,11 @@ router.post('/apis/:project/:api', cors(corsOptions), (req, res) => {
         res.status(status);
       }
       try {
-        res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+        if(query && req.query[`${query}`]){
+          res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${req.query[`${query}`]}.json`)));
+        } else {
+          res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+        }
       }
       catch(err) {
         res.status(404);
@@ -222,16 +228,11 @@ router.get('/add-api/:project/:name', isLoggedInAndCMSAdmin,  (req, res) => {
         "name": req.params.name,
         "tags": ["new"],
         "id": randomHash,
-        "versions": [
-          {
-            "version": "v1"
-          }
-        ],
-        "active_version": "v1"
+        "versions": [],
+        "active_version": null
       }
     )
     fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/project.json`), JSON.stringify(data));
-    fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${randomHash}/v1.json`), '{"foo":"foo"}');
     res.send(req.params.id);
   }
 });
@@ -279,17 +280,37 @@ router.get('/delete-api/:project/:id', isLoggedInAndCMSAdmin, (req, res) => {
 router.post('/add-version', isLoggedInAndCMSAdmin, (req, res) => {
   let payload = req.body;
   let data = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${payload.project}/project.json`));
-  let versionName = "";
+  let version =  uuidv1();
+
 
   data.list.filter((api) => {
     if(api.id === payload.id){
-      versionName = `v${api.versions.length+1}`;
-      api.versions.push({"version": versionName});
+      api.versions.push({version, name: payload.name});
     }
   })
 
   fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${payload.project}/project.json`), JSON.stringify(data));
-  fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${payload.project}/${payload.id}/${versionName}.json`), `${payload.json}`);
+  fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${payload.project}/${payload.id}/${version}.json`), `${payload.json}`);
+  res.send(payload.version);
+
+});
+
+router.post('/edit-version', isLoggedInAndCMSAdmin, (req, res) => {
+  let payload = req.body;
+  let data = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${payload.project}/project.json`));
+
+
+  data.list.filter((api) => {
+    if(api.id === payload.id){
+      api.versions.filter((version) => {
+        if(version.version === payload.version_id){
+          version.name = payload.name;
+        }
+      });
+    }
+  })
+
+  fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${payload.project}/project.json`), JSON.stringify(data));
   res.send(payload.version);
 
 });

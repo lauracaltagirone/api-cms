@@ -86,9 +86,10 @@ var app = {
   addVersionConfirm(context){
     var project = $(context).data("project");
     var id = $(context).data("id");
+    var name = $("#version-name").val();
     try {
       var json =JSON.parse($("#version-json").val())
-      $.post( "/apicms/add-version", { project, id, json: JSON.stringify(json)})
+      $.post( "/apicms/add-version", { project, id, json: JSON.stringify(json), name})
       .done(function( data ) {
         if(data === "alreadExists"){
           alert("Version already exists")
@@ -103,6 +104,35 @@ var app = {
     } catch (e) {
         alert("Not a valid JSON");
     }
+    localStorage.setItem("api", `${project}_${id}`);
+  },
+  editVersion(context){
+    var apiName = $(context).data("name");
+    var id = $(context).data("id");
+    var version = $(context).data("version");
+    var project = $(context).data("project");
+    $("#edit-version-confirm").data("project", project);
+    $("#edit-version-confirm").data("id", id);
+    $("#edit-version-confirm").data("version", version);
+    $("#edit-version").modal();
+  },
+  editVersionConfirm(context){
+    var project = $(context).data("project");
+    var id = $(context).data("id");
+    var version_id = $(context).data("version");
+    var name = $("#edit-version-name").val();
+    $.post( "/apicms/edit-version", { version_id, project, id, name})
+    .done(function( data ) {
+      if(data === "alreadExists"){
+        alert("Version already exists")
+      } else {
+        if(data === "emptyName"){
+          alert("Version name cannot be empty")
+        } else{
+          setTimeout(function(){ window.location.reload() }, 500);
+        }
+      }
+    });
     localStorage.setItem("api", `${project}_${id}`);
   },
   setActiveVersion(context){
@@ -155,14 +185,18 @@ var app = {
       var template = Handlebars.compile(source);
       $("#apis").html(template({data: data.data}));
       app.loadQrCodes();
+      app.createClipBoards();
     } else {
       $("#apis").html("No apis found.")
     }
   },
   loadQrCodes(){
     $( ".qrcode" ).each(function( index, api ) {
-      $(api).qrcode({width: 64,height: 64, text: `${window.location.host}/${$(this).data("path")}`});
+      $(api).qrcode({width: 100,height: 100, text: `${window.location.host}/${$(this).data("path")}`});
     });
+  },
+  createClipBoards(){
+    new ClipboardJS('.btn');
   },
   paginate(project){
     if(!project){
@@ -200,6 +234,7 @@ var app = {
       var template = Handlebars.compile(source);
       $("#apis").html(template({"project": data.data.project}));
       app.loadQrCodes();
+      app.createClipBoards();
       app.paginate(data.data.project);
       $('.pagination').show();
     } else {
@@ -245,6 +280,7 @@ Handlebars.registerHelper('inc', function(val){
 
 $(document).ready(function(){
   app.loadQrCodes();
+  app.createClipBoards();
   app.paginate();
   if(localStorage.getItem("api")){
     $(`#${localStorage.getItem("api")}`).addClass("in");
