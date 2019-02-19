@@ -302,7 +302,6 @@ h1{
                       <span>This API has no versions yet.</span>
                     {{/unless}}
                     <div class="collapse" id="{{project.id}}_{{api.id}}">
-
                       <hr />
                       <ul class="nav nav-pills versions">
                         {{#each api.versions as |version|}}
@@ -313,9 +312,6 @@ h1{
                           {{#each api.versions as |version|}}
 
                             <div id="{{project.id}}_{{api.id}}_{{version.version}}" class="tab-pane fade in {{#if (equals api.active_version version.version)}}active{{/if}}">
-                    
-                            <p class="hash"><b>  VERSION ID: </b><i>{{version.version}}</i></p>
-                                <button type="button" data-clipboard-text="{{version.version}}" class="btn btn-success btn-xs" name="button"> <span class="glyphicon glyphicon-copy"></span> Copy hash to clipboard</button>
 
                               <div class="row text-right">
                                 <button type="button" data-clipboard-text="{{version.json}}" class="btn btn-success copy-hash copy-version  btn-xs" name="button"> <span class="glyphicon glyphicon-copy"></span> Copy JSON to clipboard</button>
@@ -331,7 +327,7 @@ h1{
                                   <button type="button" class="btn btn-primary btn-xs delete-version" data-project="{{project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.deleteVersion(this)">Delete
                                   version</button>
 
-                                  <button type="button" class="btn btn-primary btn-xs edit-version" data-project="{{project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.editVersion(this)">Edit version</button>
+                                  <button type="button" class="btn btn-primary btn-xs edit-version" data-qs="{{version.qs}}" data-version_name="{{version.name}}" data-project="{{project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.editVersion(this)">Edit version</button>
                                   <button type="button" class="btn btn-primary btn-xs save-json" data-project="{{project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.saveJSON(this)">Save JSON</button>
 
                               </div>
@@ -341,6 +337,10 @@ h1{
                     </div>
 
                     <br>
+<br />
+                    {{#if api.query}}
+                      <p class="hash"><b>  OVERRITTEN BY FOLLOWING QUERY STRING: </b><i>{{toQueryString api.query}}</i></p>
+                    {{/if}}
                     <hr />
                     <div class="">
                       <a class="active-link" href="/apicms/apis/{{project.id}}/{{api.id}}" target="_blank"><span class="glyphicon glyphicon glyphicon-link"></span> Go to API</a>
@@ -404,13 +404,13 @@ h1{
           <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control status" name="status" placeholder="Status" aria-describedby="basic-addon1">
         </div>
         <div class="form-group">
-          <label for="tags">Query param (BETA):</label>
+          <label for="tags">Query params (BETA):</label>
           <input type="text" class="form-control query" name="query" placeholder="Query param" aria-describedby="basic-addon1">
         </div>
         <input type="hidden" class="form-control old-name" name="tags" placeholder="API name" aria-describedby="basic-addon1">
 
         <br>
-        <span>*Please separate tags with ";"</span>
+        <span>*Please separate tags and query params with ";"</span>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -462,6 +462,7 @@ h1{
           <label for="version-name">Version name</label>
           <input type="text" class="form-control" name="version-name" id="version-name" placeholder="Version name" aria-describedby="basic-addon1" required>
         </div>
+        <br />
         <div class="form-group">
           <label for="comment">JSON:</label>
           <textarea class="form-control" rows="5" name="version-json" id="version-json">{{version.json}}</textarea>
@@ -490,6 +491,15 @@ h1{
           <label for="edit-version-name">Version name</label>
           <input type="text" class="form-control" name="edit-version-name" id="edit-version-name" placeholder="Version name" aria-describedby="basic-addon1" required>
         </div>
+        <br />
+        <div class="input-group">
+          <label for="edit-version-qs">Version query string values</label>
+          <input type="text" class="form-control" name="edit-version-qs" id="edit-version-qs" placeholder="Version query string" aria-describedby="basic-addon1" required>
+        </div>
+
+        <br />
+        <br />
+        *Separate query string values with "_"
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

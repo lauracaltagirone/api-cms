@@ -142,35 +142,51 @@ router.get('/apis/:project/:api', cors(corsOptions), (req, res) => {
   apis.list.filter((api) => {
     if(api.id === api_id){
       active_version = api.active_version;
-      delay = api.delay;
+      delay = api.delay === undefined || api.delay === null ? 0 : api.delay;;
       status = api.status;
-      query = api.query ? api.query : null;
+      query_params = api.query ? api.query.split(';') : null;
+        if(active_version === ""){
+          res.send("Thsi API doesn't have an active version.");
+        } else{
+          setTimeout(() => {
+            if (httpStatus.includes(status)){
+              res.status(status);
+            }
+            try {
+              if(query_params && query_params.length){
+                let final_query = "";
+                query_params.filter((param, index) => {
+                  if(index === 0){
+                    final_query += req.query[`${param}`]
+                  }else{
+                    final_query += '_' + req.query[`${param}`];
+                  }
+                });
+                let version_exists = false;
+                api.versions.filter((version)=> {
+                  if (version.qs === final_query){
+                    version_exists = true;
+                    res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${version.version}.json`)));
+                  }
+                });
+                if(!version_exists){
+                  res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+                }
+              } else {
+                res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
+              }
+            }
+            catch(err) {
+              res.status(404);
+              res.send("Thsi API doesn't exist.");
+            }
+          }, delay);
+
+        }
+
     }
   });
 
-  delay = delay === undefined || delay === null ? 0 : delay;
-
-  if(active_version === ""){
-    res.send("Thsi API doesn't have an active version.");
-  } else{
-    setTimeout(() => {
-      if (httpStatus.includes(status)){
-        res.status(status);
-      }
-      try {
-        if(query && req.query[`${query}`]){
-          res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${req.query[`${query}`]}.json`)));
-        } else {
-          res.send(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/${req.params.api}/${active_version}.json`)));
-        }
-      }
-      catch(err) {
-        res.status(404);
-        res.send("Thsi API doesn't exist.");
-      }
-    }, delay);
-
-  }
 });
 
 router.post('/apis/:project/:api', cors(corsOptions), (req, res) => {
@@ -305,6 +321,7 @@ router.post('/edit-version', isLoggedInAndCMSAdmin, (req, res) => {
       api.versions.filter((version) => {
         if(version.version === payload.version_id){
           version.name = payload.name;
+          version.qs = payload.query_string;
         }
       });
     }

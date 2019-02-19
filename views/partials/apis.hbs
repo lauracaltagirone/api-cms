@@ -24,7 +24,6 @@
           <span>This API has no versions yet.</span>
         {{/unless}}
         <div class="collapse" id="{{../../project.id}}_{{api.id}}">
-
           <hr />
           <ul class="nav nav-pills versions">
             {{#each api.versions as |version|}}
@@ -35,9 +34,6 @@
               {{#each api.versions as |version|}}
 
                 <div id="{{../../project.id}}_{{api.id}}_{{version.version}}" class="tab-pane fade in {{#if (equals api.active_version version.version)}}active{{/if}}">
-
-                <p class="hash"><b>  VERSION ID: </b><i>{{version.version}}</i></p>
-                    <button type="button" data-clipboard-text="{{version.version}}" class="btn btn-success btn-xs" name="button"> <span class="glyphicon glyphicon-copy"></span> Copy hash to clipboard</button>
 
                   <div class="row text-right">
                     <button type="button" data-clipboard-text="{{version.json}}" class="btn btn-success copy-hash copy-version  btn-xs" name="button"> <span class="glyphicon glyphicon-copy"></span> Copy JSON to clipboard</button>
@@ -53,7 +49,7 @@
                       <button type="button" class="btn btn-primary btn-xs delete-version" data-project="{{../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.deleteVersion(this)">Delete
                       version</button>
 
-                      <button type="button" class="btn btn-primary btn-xs edit-version" data-project="{{../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.editVersion(this)">Edit version</button>
+                      <button type="button" class="btn btn-primary btn-xs edit-version" data-qs="{{version.qs}}" data-version_name="{{version.name}}" data-project="{{../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.editVersion(this)">Edit version</button>
                       <button type="button" class="btn btn-primary btn-xs save-json" data-project="{{../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.saveJSON(this)">Save JSON</button>
 
                   </div>
@@ -63,19 +59,3 @@
         </div>
 
         <br>
-        <hr />
-        <div class="">
-          <a class="active-link" href="/apicms/apis/{{../../project.id}}/{{api.id}}" target="_blank"><span class="glyphicon glyphicon glyphicon-link"></span> Go to API</a>
-          <a class="active-link" href="#" role="button" data-remove="{{api.id}}" data-project="{{../../project.id}}" onclick="app.deleteAPI(this)"><span class="glyphicon glyphicon glyphicon-remove"></span> Delete API</a>
-          <a class="active-link" href="#" role="button" data-id="{{api.id}}" data-name="{{api.name}}" data-project="{{../../project.id}}" onclick="app.addVersion(this)"><span class="glyphicon glyphicon glyphicon-plus"></span> Add version</a>
-          <a class="active-link" href="#" role="button" data-project="{{../../project.id}}" data-query="{{api.query}}" data-id="{{api.id}}" data-old-name="{{api.name}}" data-tags="{{tagsToString api.tags}}" data-status="{{api.status}}" data-delay="{{api.delay}}" onclick="app.editAPI(this)"><span class="glyphicon glyphicon glyphicon-edit"></span>
-            Edit API</a>
-        </div>
-
-      </div>
-    </div>
-
-    <br>
-    {{/each}}
-  </div>
-{{/each}}

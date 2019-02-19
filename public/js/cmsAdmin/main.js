@@ -111,9 +111,13 @@ var app = {
     var id = $(context).data("id");
     var version = $(context).data("version");
     var project = $(context).data("project");
+    var query_string = $(context).data("qs");
+    var version_name = $(context).data("version_name");
     $("#edit-version-confirm").data("project", project);
     $("#edit-version-confirm").data("id", id);
     $("#edit-version-confirm").data("version", version);
+    $("#edit-version-name").val(version_name);
+    $("#edit-version-qs").val(query_string);
     $("#edit-version").modal();
   },
   editVersionConfirm(context){
@@ -121,7 +125,9 @@ var app = {
     var id = $(context).data("id");
     var version_id = $(context).data("version");
     var name = $("#edit-version-name").val();
-    $.post( "/apicms/edit-version", { version_id, project, id, name})
+    var query_string = $("#edit-version-qs").val();
+
+    $.post( "/apicms/edit-version", { query_string,version_id, project, id, name})
     .done(function( data ) {
       if(data === "alreadExists"){
         alert("Version already exists")
@@ -272,6 +278,11 @@ Handlebars.registerHelper('getRandomColor', function(){
   }
   return color;
 });
+
+Handlebars.registerHelper('toQueryString', function(queries){
+  return queries.split(';').join(' & ');
+});
+
 
 Handlebars.registerHelper('inc', function(val){
   return val+1;

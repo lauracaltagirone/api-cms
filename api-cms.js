@@ -53,6 +53,9 @@ app.engine('handlebars', exphbs({
         .toUpperCase();
       return "#00000".substring(0, 7 - c.length) + c;
     },
+    toQueryString(queries){
+      return queries.split(';').join(' & ');
+    },
     getRandomColor(){
       var letters = '0123456789ABCDEF';
       var color = '#';
