@@ -252,19 +252,19 @@ h1{
       <p class="progress-info">{{project.size}} MB / {{project.maxSize}} MB Used</p>
       <div class="apis collapse {{#if (equals ../projects.length 1)}}in{{/if}}" id="{{project.id}}">
         <div class="row">
-        <div class="col-xs-4">
+        <div class="col-xs-12 col-md-4">
           <h4>Search by name:</h4>
           <div class="form-group">
           <input type="text" class="form-control search" data-search="name" placeholder="Search by name">
         </div>
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-12 col-md-4">
           <h4>Search by TAG:</h4>
           <div class="form-group">
           <input type="text" class="form-control search" data-search="tag" placeholder="Search by TAG">
         </div>
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-12 col-md-4">
           <h4>Search by HASH:</h4>
           <div class="form-group">
           <input type="text" class="form-control search" data-search="hash" placeholder="Search by HASH">
@@ -339,7 +339,7 @@ h1{
                     <br>
 <br />
                     {{#if api.query}}
-                      <p class="hash"><b>  OVERRITTEN BY FOLLOWING QUERY STRING: </b><i>{{toQueryString api.query}}</i></p>
+                      <p class="hash"><b>  OVERWRITTEN BY FOLLOWING QUERY STRING: </b><i>{{toQueryString api.query}}</i></p>
                     {{/if}}
                     <hr />
                     <div class="">
