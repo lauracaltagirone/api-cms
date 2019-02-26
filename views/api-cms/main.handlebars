@@ -315,6 +315,8 @@ h1{
 
                             <div id="{{project.id}}_{{api.id}}_{{version.version}}" class="tab-pane fade in {{#if (equals api.active_version version.version)}}active{{/if}}">
 
+                              <p class="api-hash hash" id="hash_{{version.version}}"><b>  VERSION ID: &nbsp</b><i>{{version.version}}</i></p>
+
                               <div class="row text-right">
                                 <button type="button" data-clipboard-text="{{version.json}}" class="btn btn-success copy-hash copy-version  btn-xs" name="button"> <span class="glyphicon glyphicon-copy"></span> Copy JSON to clipboard</button>
                               </div>

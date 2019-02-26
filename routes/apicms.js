@@ -39,48 +39,51 @@ router.get('/apis-manager', isLoggedInAndCMSAdmin, (req, res) => {
 
     let projects = [];
     let users = [];
-    if(req.user.role === "cmsSuperAdmin"){
-      fse.readJsonSync(path.join(req.rootPath, `api-cms-db/projects-list.json`)).list.filter((project) => {
-          projects.push(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${project}/project.json`)));
-      });
-      users = fse.readJsonSync(path.join(req.rootPath, `users.json`));
-    } else {
-      req.user.projects.filter((project) => {
-          projects.push(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${project}/project.json`)));
-      });
-    }
-    projects.filter((project) => {
-        let size = ((fsUtils.fsizeSync(path.join(req.rootPath,`api-cms-db/${project.id}`))) / 1024 / 1024).toFixed(2);
-        project.percentage = (size/project.maxSize) *100;
-        project.size = size;
-        let count = 0;
-        let apis_chunks = [];
-        let apis_chunk = [];
-        project.list.filter((api) => {
-          if(count === 3){
-            apis_chunks.push(apis_chunk);
-            apis_chunk = [];
-            count = 0;
-          }
-          api.versions.forEach((version, index) => {
-            let json = fse.readJsonSync(path.join(req.rootPath,`api-cms-db/${project.id}/${api.id}/${version.version}.json`));
-            version.json = JSON.stringify(json);
-          });
-          apis_chunk.push(api);
-          count++;
+    if(req.user){
+      if(req.user.role === "cmsSuperAdmin"){
+        fse.readJsonSync(path.join(req.rootPath, `api-cms-db/projects-list.json`)).list.filter((project) => {
+            projects.push(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${project}/project.json`)));
         });
-        if(apis_chunk.length && project.list.length >= 4){
-          apis_chunks.push(apis_chunk);
-        }
-        if(project.list.length >= 4){
-          project.list = apis_chunks;
-        } else {
-          project.list = [apis_chunk];
-        }
-    });
+        users = fse.readJsonSync(path.join(req.rootPath, `users.json`));
+      } else {
+        req.user.projects.filter((project) => {
+            projects.push(fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${project}/project.json`)));
+        });
+      }
 
-    res.render('api-cms/main', {projects, users, layout: "basic-bootstrap", user: req.user})
-
+      projects.filter((project) => {
+          let size = ((fsUtils.fsizeSync(path.join(req.rootPath,`api-cms-db/${project.id}`))) / 1024 / 1024).toFixed(2);
+          project.percentage = (size/project.maxSize) *100;
+          project.size = size;
+          let count = 0;
+          let apis_chunks = [];
+          let apis_chunk = [];
+          project.list.filter((api) => {
+            if(count === 3){
+              apis_chunks.push(apis_chunk);
+              apis_chunk = [];
+              count = 0;
+            }
+            api.versions.forEach((version, index) => {
+              let json = fse.readJsonSync(path.join(req.rootPath,`api-cms-db/${project.id}/${api.id}/${version.version}.json`));
+              version.json = JSON.stringify(json);
+            });
+            apis_chunk.push(api);
+            count++;
+          });
+          if(apis_chunk.length && project.list.length >= 4){
+            apis_chunks.push(apis_chunk);
+          }
+          if(project.list.length >= 4){
+            project.list = apis_chunks;
+          } else {
+            project.list = [apis_chunk];
+          }
+      });
+      res.render('api-cms/main', {projects, users, layout: "basic-bootstrap", user: req.user})
+    } else {
+      res.send('Your fingerprint is valid');
+    }
 });
 
 router.get('/get-all-apis/:project', isLoggedInAndCMSAdmin, (req, res) => {
@@ -568,17 +571,28 @@ router.get('/search-by/:projectId/:what/:term', isLoggedInAndCMSAdmin,  (req, re
 });
 
 function isLoggedInAndCMSAdmin(req, res, next) {
+  let fingerPrints = fse.readJsonSync(path.join(req.rootPath, `fingerprints.json`));
+  let fingerprint = req.headers.fingerprint;
+  let validFingerPrint = fingerPrints.includes(fingerprint);
   // if user is authenticated in the session, carry on
-  if (req.isAuthenticated() && ((req.user.role === 'cmsAdmin') || (req.user.role === 'cmsSuperAdmin')))
+  if(validFingerPrint){
+    req.validFingerPrint = true;
+  }
+  if ((req.isAuthenticated() && ((req.user.role === 'cmsAdmin') || (req.user.role === 'cmsSuperAdmin'))) || validFingerPrint)
     return next();
-
   // if they aren't redirect them to the home page
   res.redirect('/');
 }
 
 function isLoggedInAndCmsSuperAdmin(req, res, next){
+  let fingerPrints = fse.readJsonSync(path.join(req.rootPath, `fingerprints.json`));
+  let fingerprint = req.headers.fingerprint;
+  let validFingerPrint = fingerPrints.includes(fingerprint);
   // if user is authenticated in the session, carry on
-  if (req.isAuthenticated() && req.user.role === 'cmsSuperAdmin')
+  if(validFingerPrint){
+    req.validFingerPrint = true;
+  }
+  if ((req.isAuthenticated() && req.user.role === 'cmsSuperAdmin') || validFingerPrint)
     return next();
 
   // if they aren't redirect them to the home page
