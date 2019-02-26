@@ -335,7 +335,7 @@ router.post('/edit-version', isLoggedInAndCMSAdmin, (req, res) => {
 
 });
 
-router.get('/set-active-version/:project/:id/:version/:status', cors(), isLoggedInAndCMSAdmin, (req, res) => {
+router.get('/set-active-version/:project/:id/:version/:status', cors(corsOptions),isLoggedInAndCMSAdmin, (req, res) => {
   let data = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/project.json`));
   data.list.filter((api) => {
     if(api.id === req.params.id){
