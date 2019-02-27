@@ -146,9 +146,9 @@ router.get('/apis/:project/:api', (req, res) => {
                 let final_query = "";
                 query_params.filter((param, index) => {
                   if(index === 0){
-                    final_query += req.query[`${param}`]
+                    final_query += req.query[`${param}`].replace('%20', ' ')
                   }else{
-                    final_query += '_' + req.query[`${param}`];
+                    final_query += '_' + req.query[`${param}`].replace('%20', ' ');
                   }
                 });
                 let version_exists = false;
