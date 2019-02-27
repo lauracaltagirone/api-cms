@@ -1,6 +1,5 @@
 let express = require('express');
 let router = express.Router();
-let cors = require('cors');
 const fs = require('fs');
 const fse = require('fs-extra');
 var fsUtils = require("nodejs-fs-utils");
@@ -21,19 +20,6 @@ var transporter = nodemailer.createTransport({
         pass: process.env.GMAIL_PASSWORD
     }
 });
-
-
-var whitelist = [undefined, 'http://192.168.1.84:8000', 'http://localhost:8000', 'http://localhost:3000', 'http://mybrand.pitchprototypes.eu', 'http://mybrand-dev.pitchprototypes.eu']
-var corsOptions = function (req, callback) {
-  var corsOptions;
-  console.log(req.header('Origin'));
-  if (whitelist.indexOf(req.header('Origin')) !== -1) {
-    corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
-  }else{
-    corsOptions = { origin: false } // disable CORS for this request
-  }
-  callback(null, corsOptions) // callback expects two parameters: error and options
-}
 
 router.get('/apis-manager', isLoggedInAndCMSAdmin, (req, res) => {
 
@@ -134,7 +120,7 @@ router.get('/get-project-users/:projectid', isLoggedInAndCMSAdmin,  (req, res) =
 });
 
 
-router.get('/apis/:project/:api', cors(corsOptions), (req, res) => {
+router.get('/apis/:project/:api', (req, res) => {
   let api_id = req.params.api;
   let project = req.params.project;
   let apis = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${project}/project.json`));
@@ -192,7 +178,7 @@ router.get('/apis/:project/:api', cors(corsOptions), (req, res) => {
 
 });
 
-router.post('/apis/:project/:api', cors(corsOptions), (req, res) => {
+router.post('/apis/:project/:api', (req, res) => {
   let api_id = req.params.api;
   let project = req.params.project;
   let apis = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${project}/project.json`));
@@ -335,7 +321,7 @@ router.post('/edit-version', isLoggedInAndCMSAdmin, (req, res) => {
 
 });
 
-router.get('/set-active-version/:project/:id/:version/:status', cors(corsOptions),isLoggedInAndCMSAdmin, (req, res) => {
+router.get('/set-active-version/:project/:id/:version/:status', isLoggedInAndCMSAdmin, (req, res) => {
   let data = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${req.params.project}/project.json`));
   data.list.filter((api) => {
     if(api.id === req.params.id){

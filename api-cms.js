@@ -15,13 +15,29 @@ let bodyParser = require('body-parser')
 let flash = require('connect-flash')
 let i18n = require('i18n-express-4plugin')
 var sassMiddleware = require('node-sass-middleware');
+let cors = require('cors');
+
+var allowedOrigins = [undefined, 'http://192.168.1.84:8000', 'http://localhost:8000', 'http://localhost:3000', 'http://mybrand.pitchprototypes.eu', 'http://mybrand-dev.pitchprototypes.eu'];
+
 
 
 
 //Express app initialization
 let app = express()
 
-
+app.use(cors({
+  origin: function(origin, callback){
+    // allow requests with no origin
+    // (like mobile apps or curl requests)
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){
+      var msg = 'The CORS policy for this site does not ' +
+                'allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
 //App configuration
 app.use(cookieParser('keyboard cat'))
 app.use(bodyParser.urlencoded({
