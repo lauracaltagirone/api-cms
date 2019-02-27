@@ -26,6 +26,7 @@ var transporter = nodemailer.createTransport({
 var whitelist = [undefined, 'http://192.168.1.84:8000', 'http://localhost:8000', 'http://localhost:3000', 'http://mybrand.pitchprototypes.eu', 'http://mybrand-dev.pitchprototypes.eu']
 var corsOptions = function (req, callback) {
   var corsOptions;
+  console.log(req.header('Origin'));
   if (whitelist.indexOf(req.header('Origin')) !== -1) {
     corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
   }else{
