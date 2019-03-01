@@ -341,7 +341,7 @@ h1{
                     </div>
 
                     <br>
-<br />
+                    <br />
                     {{#if api.query}}
                       <p class="hash"><b>  OVERWRITTEN BY FOLLOWING QUERY STRING: </b><i>{{toQueryString api.query}}</i></p>
                     {{/if}}
@@ -350,7 +350,7 @@ h1{
                       <a class="active-link" href="/apicms/apis/{{project.id}}/{{api.id}}" target="_blank"><span class="glyphicon glyphicon glyphicon-link"></span> Go to API</a>
                       <a class="active-link" href="#" role="button" data-remove="{{api.id}}" data-project="{{project.id}}" onclick="app.deleteAPI(this)"><span class="glyphicon glyphicon glyphicon-remove"></span> Delete API</a>
                       <a class="active-link" href="#" role="button" data-id="{{api.id}}" data-name="{{api.name}}" data-project="{{project.id}}" onclick="app.addVersion(this)"><span class="glyphicon glyphicon glyphicon-plus"></span> Add version</a>
-                      <a class="active-link" href="#" role="button" data-project="{{project.id}}" data-query="{{api.query}}" data-id="{{api.id}}" data-old-name="{{api.name}}" data-tags="{{tagsToString api.tags}}" data-status="{{api.status}}" data-delay="{{api.delay}}" onclick="app.editAPI(this)"><span class="glyphicon glyphicon glyphicon-edit"></span>
+                      <a class="active-link" href="#" role="button" data-project="{{project.id}}" data-queryType="{{api.queryType}}" data-query="{{api.query}}" data-id="{{api.id}}" data-old-name="{{api.name}}" data-tags="{{tagsToString api.tags}}" data-status="{{api.status}}" data-delay="{{api.delay}}" onclick="app.editAPI(this)"><span class="glyphicon glyphicon glyphicon-edit"></span>
                         Edit API</a>
                     </div>
 
@@ -410,6 +410,17 @@ h1{
         <div class="form-group">
           <label for="tags">Query params (BETA):</label>
           <input type="text" class="form-control query" name="query" placeholder="Query param" aria-describedby="basic-addon1">
+        </div>
+        <div class="form-group">
+          <label for="tags">Query Type</label>
+          <select class="form-control queryType" name="querytype" >
+            <option value="dry" id="dry">
+              Dry
+            </option>
+            <option value="partial" id="partial">
+              Partial
+            </option>
+          </select>
         </div>
         <input type="hidden" class="form-control old-name" name="tags" placeholder="API name" aria-describedby="basic-addon1">
 

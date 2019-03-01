@@ -31,6 +31,7 @@ var app = {
     var oldName = $(context).data("old-name");
     var project = $(context).data("project");
     var query = $(context).data("query");
+    var queryType = $(context).data("querytype");
     $("#edit-api-confirm").data("project", project);
     $("#edit-api-confirm").data("id", id);
     $("#edit-api .tags").val(tags);
@@ -38,6 +39,7 @@ var app = {
     $("#edit-api .status").val(status);
     $("#edit-api .delay").val(delay);
     $("#edit-api .query").val(query);
+    $(`#edit-api #${queryType}`).attr('selected', 'selected');
     $("#edit-api").modal();
   },
   editAPIConfirm(context){
@@ -48,8 +50,9 @@ var app = {
     var project = $(context).data("project");
     var id = $(context).data("id");
     var query = $("#edit-api .query").val().trim();
+    var queryType = $("#edit-api .queryType").val();
     localStorage.setItem("api", `${project}_${id}`);
-    $.post( "/apicms/edit-api", { project, name, id, tags, delay, status, query})
+    $.post( "/apicms/edit-api", { project, name, id, tags, delay, status, query, queryType})
     .done(function( data ) {
       if(data === "alreadExists"){
         alert("API already exists")

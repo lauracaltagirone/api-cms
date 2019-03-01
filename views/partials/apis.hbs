@@ -34,6 +34,7 @@
               {{#each api.versions as |version|}}
 
                 <div id="{{../../project.id}}_{{api.id}}_{{version.version}}" class="tab-pane fade in {{#if (equals api.active_version version.version)}}active{{/if}}">
+
                   <p class="api-hash hash" id="hash_{{version.version}}"><b>  VERSION ID: &nbsp</b><i>{{version.version}}</i></p>
 
                   <div class="row text-right">
@@ -60,3 +61,23 @@
         </div>
 
         <br>
+        <br />
+        {{#if api.query}}
+          <p class="hash"><b>  OVERWRITTEN BY FOLLOWING QUERY STRING: </b><i>{{toQueryString api.query}}</i></p>
+        {{/if}}
+        <hr />
+        <div class="">
+          <a class="active-link" href="/apicms/apis/{{../../project.id}}/{{api.id}}" target="_blank"><span class="glyphicon glyphicon glyphicon-link"></span> Go to API</a>
+          <a class="active-link" href="#" role="button" data-remove="{{api.id}}" data-project="{{../../project.id}}" onclick="app.deleteAPI(this)"><span class="glyphicon glyphicon glyphicon-remove"></span> Delete API</a>
+          <a class="active-link" href="#" role="button" data-id="{{api.id}}" data-name="{{api.name}}" data-project="{{../../project.id}}" onclick="app.addVersion(this)"><span class="glyphicon glyphicon glyphicon-plus"></span> Add version</a>
+          <a class="active-link" href="#" role="button" data-project="{{../../project.id}}" data-queryType="{{api.queryType}}" data-query="{{api.query}}" data-id="{{api.id}}" data-old-name="{{api.name}}" data-tags="{{tagsToString api.tags}}" data-status="{{api.status}}" data-delay="{{api.delay}}" onclick="app.editAPI(this)"><span class="glyphicon glyphicon glyphicon-edit"></span>
+            Edit API</a>
+        </div>
+
+      </div>
+    </div>
+
+    <br>
+    {{/each}}
+  </div>
+{{/each}}
