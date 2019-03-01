@@ -417,12 +417,17 @@ router.post('/enable-user', isLoggedInAndCMSAdmin,  (req, res) => {
     let userid = req.body.userid;
     let projectid = req.body.projectid;
     let status = req.body.status;
+    let fingerprint = generator.generate({
+      length: 15,
+      numbers: true
+    });
     let password = generator.generate({
       length: 10,
       numbers: true
     });
     let users =  fse.readJsonSync(path.join(req.rootPath, `users.json`));
     let project = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${projectid}/project.json`));
+    let fingerprints = fse.readJsonSync(path.join(req.rootPath, `fingerprints.json`));
     var mailOptions = {}
 
     users.filter((user) => {
@@ -430,6 +435,8 @@ router.post('/enable-user', isLoggedInAndCMSAdmin,  (req, res) => {
         if(status === 'true'){
           user.projects.push(projectid);
           project.users.push(userid);
+          user.fingerprint = fingerprint;
+          fingerprints.push(fingerprint);
           if(user.projects.length === 1){
             mailOptions = {
               from: 'iamadumbmailer@gmail.com', // sender address
@@ -439,7 +446,8 @@ router.post('/enable-user', isLoggedInAndCMSAdmin,  (req, res) => {
             };
             if(user.password === null || user.password === undefined || !user.password.length){
               user.password = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-              mailOptions.html = `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been added to ${project.name} project. <br>Please Login at <a href="www.api.acz-core.com">api.acz-core.com</a> with following credentials:<br> <b>Email:</b>${user.email}<br><b>Password:</b> ${password}`;
+              user.fingerprint = fingerprint;
+              mailOptions.html = `<h2>Hi ${user.name} ${user.surname}</h2><br> You have been added to ${project.name} project. <br>Please Login at <a href="www.api.acz-core.com">api.acz-core.com</a> with following credentials:<br> <b>Email:</b>${user.email}<br><b>Password:</b> ${password}<br><br>Your unique fingerprint is: ${fingerprint}`;
             }
           } else{
             mailOptions = {
@@ -479,6 +487,7 @@ router.post('/enable-user', isLoggedInAndCMSAdmin,  (req, res) => {
 
 
     fse.outputFileSync(path.join(req.rootPath, `users.json`), JSON.stringify(users));
+    fse.outputFileSync(path.join(req.rootPath, `fingerprints.json`), JSON.stringify(fingerprints));
     fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${projectid}/project.json`), JSON.stringify(project));
 
     res.send(password);
