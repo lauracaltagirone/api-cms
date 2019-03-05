@@ -175,7 +175,7 @@ router.get('/apis/:project/:api', (req, res) => {
             }
             catch(err) {
               res.status(404);
-              res.send("Thsi API doesn't exist.");
+              res.send(err);
             }
           }, delay);
 
