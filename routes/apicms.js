@@ -129,6 +129,7 @@ router.get('/apis/:project/:api', (req, res) => {
   let delay;
   let status;
   let query;
+  let query_params;
   apis.list.filter((api) => {
     if(api.id === api_id){
       active_version = api.active_version;
@@ -180,7 +181,6 @@ router.get('/apis/:project/:api', (req, res) => {
             }
           });
         }
-
     }
   });
 
@@ -194,6 +194,7 @@ router.post('/apis/:project/:api', (req, res) => {
   let delay;
   let status;
   let query;
+  let query_params;
   apis.list.filter((api) => {
     if(api.id === api_id){
       active_version = api.active_version;
