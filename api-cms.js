@@ -44,7 +44,8 @@ app.use(bodyParser.urlencoded({
   extended: true
 }))
 app.use(bodyParser.json({
-  extended: true
+  extended: true,
+  limit: '3MB' 
 }))
 app.engine('handlebars', exphbs({
   defaultLayout: 'basic-bootstrap',
