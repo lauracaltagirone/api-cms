@@ -41,11 +41,12 @@ app.use(cors({
 //App configuration
 app.use(cookieParser('keyboard cat'))
 app.use(bodyParser.urlencoded({
-  extended: true
+  extended: true,
+  limit: '3mb'
 }))
 app.use(bodyParser.json({
   extended: true,
-  limit: '3MB' 
+  limit: '3mb'
 }))
 app.engine('handlebars', exphbs({
   defaultLayout: 'basic-bootstrap',
