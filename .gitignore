@@ -56,3 +56,7 @@ typings/
 
 # dotenv environment variables file
 .env
+sessions
+api-cms-db/*
+users.json
+fingerprints.json
