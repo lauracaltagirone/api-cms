@@ -2,7 +2,7 @@
   "id": "47997610-1ffc-11e9-bc04-97fe84a2b63a",
   "name": "Super",
   "surname": "User",
-  "email": "acz@super-user.com",
+  "email": "apicms@super-user.com",
   "password": "$2a$08$1y3WvSTeg41SN4H9hqJ2f.mGyYupujdqYLm1N6GVjZpMDdU7wzsJG",
   "role": "cmsSuperAdmin",
   "projects": []

@@ -48,7 +48,6 @@ var admin = {
       $.get(`/apicms/get-project-users/${projectid}`, (users) => {
         $("#active-users").html("");
         $("#search-users").html("");
-
         admin.buildManageUsers(users, projectid);
       });
     });
