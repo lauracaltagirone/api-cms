@@ -612,10 +612,15 @@ router.get('/external-edit/:projectId/:apiId/:externalEditHash', (req, res) => {
   let apiId = req.params.apiId;
   let project = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${projectId}/project.json`));
   let versionFound = false;
+  let apiHasNotifications = false;
   project.list.filter((api) => {
     if(api.id === apiId){
       api.versions.filter((version) => {
         if(version.externalEditHash === externalEditHash){
+          if(req.user){
+            version.externalNewEdit = false;
+            version.hasNewMessage = false;
+          }
           versionFound = true;
           let versionJSON = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${projectId}/${apiId}/${version.version}.json`));
           res.render('api-cms/external-edit', {
@@ -628,12 +633,20 @@ router.get('/external-edit/:projectId/:apiId/:externalEditHash', (req, res) => {
             'user': req.user
           })
         }
+        if(version.externalNewEdit || version.hasNewMessage){
+          apiHasNotifications = true;
+        }
       });
+      if(req.user && !apiHasNotifications){
+        api.externalNewEdit = false;
+      }
     }
   });
   if(!versionFound){
     res.send("Version not found");
   }
+  fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${projectId}/project.json`), JSON.stringify(project));
+
 });
 
 router.post('/external-save/:projectId/:apiId/:externalEditHash', (req, res) => {
@@ -645,6 +658,7 @@ router.post('/external-save/:projectId/:apiId/:externalEditHash', (req, res) => 
   let versionFound = false;
   project.list.filter((api) => {
     if(api.id === apiId){
+      api.externalNewEdit = true;
       api.versions.filter((version) => {
         if(version.externalEditHash === externalEditHash){
           versionFound = true;
@@ -679,6 +693,9 @@ router.post('/external-save-comment/:projectId/:apiId/:externalEditHash', (req, 
             issuer,
             isInternal: req.user ? true : false
           });
+          if(!req.user){
+            version.hasNewMessage = true;
+          }
           fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${projectId}/project.json`), JSON.stringify(project));
           res.send("success");
         }

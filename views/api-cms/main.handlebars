@@ -283,6 +283,7 @@ h1{
                 {{#each chunk as |api|}}
 
                 <div class="api {{api.id}}">
+
                   <div class="qrcode" data-path="apicms/{{api.id}}">
 
                   </div>
@@ -295,7 +296,13 @@ h1{
                       {{/each}}
                     </div>
                     <a data-toggle="collapse" href="#{{project.id}}_{{api.id}}">
-                      <h3>{{api.name}}</h3>
+                      <h3>
+                        {{api.name}}
+                        {{#if api.externalNewEdit}}
+                          <span class="glyphicon glyphicon-question-sign" title="You may have one or more notifications for this API"></span>
+                        {{/if}}
+                      </h3>
+
                     </a>
                     <p class="api-hash hash" id="hash_{{api.id}}"><b>  API ID: &nbsp</b><i>{{api.id}}</i></p>
 
@@ -307,7 +314,17 @@ h1{
                       <hr />
                       <ul class="nav nav-pills versions">
                         {{#each api.versions as |version|}}
-                          <li class="{{#if (equals api.active_version version.version)}}active{{/if}} version"><a data-toggle="tab" href="#{{project.id}}_{{api.id}}_{{version.version}}">{{version.name}}</a></li>
+                          <li class="{{#if (equals api.active_version version.version)}}active{{/if}} version">
+                            <a data-toggle="tab" href="#{{project.id}}_{{api.id}}_{{version.version}}">
+                              {{version.name}}
+                              {{#if version.externalNewEdit}}
+                                <span class="glyphicon glyphicon-question-sign" title="External JSON changed"></span>
+                              {{/if}}
+                              {{#if version.hasNewMessage}}
+                                <span class="glyphicon glyphicon-envelope" title="New message for this API"></span>
+                              {{/if}}
+                            </a>
+                          </li>
 
                         {{/each}}
                         <div class="tab-content">
