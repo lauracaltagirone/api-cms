@@ -637,7 +637,7 @@ router.get('/external-edit/:projectId/:apiId/:externalEditHash', (req, res) => {
 });
 
 router.post('/external-save/:projectId/:apiId/:externalEditHash', (req, res) => {
-  let json = req.body;
+  let json = req.body.externalJSON;
   let projectId = req.params.projectId;
   let externalEditHash = req.params.externalEditHash;
   let apiId = req.params.apiId;
@@ -648,7 +648,7 @@ router.post('/external-save/:projectId/:apiId/:externalEditHash', (req, res) => 
       api.versions.filter((version) => {
         if(version.externalEditHash === externalEditHash){
           versionFound = true;
-          version.externalJSON = JSON.stringify(json);
+          version.externalJSON = json;
           version.externalNewEdit = true;
           fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${projectId}/project.json`), JSON.stringify(project));
           res.send("success");

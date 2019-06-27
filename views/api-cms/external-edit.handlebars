@@ -182,7 +182,7 @@ $(document).ready(function(){
   window.saveExternal = function saveExternal(){
     let url = location.href.replace("external-edit", "external-save");
     let externalJSON = externalEditor.get();
-    $.post(url, externalJSON, (data) => {
+    $.post(url, {'externalJSON': JSON.stringify(externalJSON)}, (data) => {
       if(data === "success"){
         window.location.reload();
       } else{
