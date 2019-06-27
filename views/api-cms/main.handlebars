@@ -333,7 +333,7 @@ h1{
 
                                   <button type="button" class="btn btn-primary btn-xs edit-version" data-qs="{{version.qs}}" data-version_name="{{version.name}}" data-project="{{project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.editVersion(this)">Edit version</button>
                                   <button type="button" class="btn btn-primary btn-xs save-json" data-project="{{project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.saveJSON(this)">Save JSON</button>
-
+                                  <a class="btn btn-primary" href="/apicms/external-edit/{{project.id}}/{{api.id}}/{{version.externalEditHash}}">External edit</a>
                               </div>
                           {{/each}}
                         </div>

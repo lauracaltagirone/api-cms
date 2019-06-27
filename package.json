@@ -1,6 +1,6 @@
 {
   "name": "api-cms",
-  "version": "1.0.45",
+  "version": "1.0.46",
   "description": "",
   "main": "api-cms.js",
   "scripts": {
@@ -26,6 +26,7 @@
     "hapi": "^17.5.2",
     "i18n-express-4plugin": "^0.0.6",
     "install": "^0.12.2",
+    "moment": "^2.24.0",
     "mongodb": "^3.1.1",
     "mongoose": "^5.2.7",
     "node-sass-middleware": "^0.11.0",

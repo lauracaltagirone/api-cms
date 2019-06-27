@@ -1,0 +1,208 @@
+<style media="screen">
+  body{
+    padding: 30px;
+  }
+  h3{
+    margin-bottom: 40px;
+  }
+  .row{
+    margin: 0;
+  }
+  .comment {
+    display: flex;
+    justify-content: flex-end;
+    margin: 10px 0;
+  }
+  .comment .wrapper{
+    background: #e1f9c3;
+    padding: 10px;
+    border-radius: 10px;
+    width: 80%;
+    position: relative;
+  }
+  .date{
+    position: absolute;
+    right: 8px;
+    top: 6px;
+    font-size: 1rem;
+  }
+  .comment.internal{
+    justify-content: flex-start;
+  }
+  .comment.internal .wrapper{
+    background: #c3e0f9;
+  }
+
+</style>
+<h1>Project name: {{projectName}}</h1>
+<h2>Api name: {{apiName}}</h2>
+<h3>Version name: {{versionName}}</h3>
+<div class="row">
+  <button type="button" class="btn btn-primary" name="button" onclick="window.seeComments()">See comments</button>
+  <button type="button" class="btn btn-primary" name="button" onclick="window.compare()">Compare</button>
+  <button type="button" class="btn btn-primary" name="button" onclick="window.saveExternal()">Save external</button>
+  {{#if user}}
+    <button type="button" class="btn btn-primary" name="button">Approve external</button>
+  {{/if}}
+</div>
+<br />
+<br />
+<ul class="nav nav-tabs">
+  <li class="active"><a data-toggle="tab" href="#home">Internal JSON</a></li>
+  <li><a data-toggle="tab" href="#menu1">External JSON</a></li>
+</ul>
+
+<br /><br />
+<div class="tab-content">
+  <div id="home" class="tab-pane fade in active">
+    <br />
+    <br />
+
+    <div class="row">
+      {{versionJSON}}
+    </div>
+  </div>
+  <div id="menu1" class="tab-pane fade">
+      <br />
+        <br />
+    <div class="col-xs-6">
+      <div id="external">
+
+      </div>
+
+    </div>
+    <div class="col-xs-6">
+      <div id="external-plain">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="internal-editor-json" data-json="{{versionJSON}}">
+
+</div>
+<div id="external-editor-json" data-json="{{externalJSON}}">
+
+</div>
+<div class="modal fade" id="compare-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Compare result</h5>
+      </div>
+      <div class="modal-body">
+        <div id="visual"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="comments-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Comments</h5>
+      </div>
+      <div class="modal-body">
+        {{#each version.comments as |comment|}}
+        <div class="comment {{#if comment.isInternal}}internal{{/if}}">
+          <div class="wrapper">
+            <b>{{comment.issuer}}</b>
+            <p>{{comment.comment}}</p>
+            <i class="date">{{comment.date}}</i>
+          </div>
+        </div>
+        {{/each}}
+        <br>
+        <hr>
+        <br />
+        <h4>ADD A COMMENT:</h4>
+        <div class="input-group">
+          <label for="project-name">ISSUER</label>
+          <input type="text" class="form-control" name="issuer" id="issuer" placeholder="Issuer" aria-describedby="basic-addon1" value="{{user.name}}" required>
+        </div>
+        <br />
+        <div class="form-group">
+          <label for="comment">NEW COMMENT:</label>
+          <textarea id="comment" class="form-control" rows="5"></textarea>
+        </div>
+        <button type="button" onclick="window.addComment()" class="btn btn-success" name="button">Save</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<link rel="stylesheet" href="/frameworks/json-editor.css">
+<script type="text/javascript" src="/frameworks/json-editor.js" defer></script>
+<link rel="stylesheet" href="/frameworks/jsonDiffPatch.css">
+<script type="text/javascript" src="/frameworks/jsonDiffPatch.min.js" defer='defer'></script>
+
+<script type="text/javascript" defer>
+$(document).ready(function(){
+  window.internalJSON = $("#internal-editor-json").data("json");
+
+
+  var externalEditor = new JSONEditor(document.getElementById("external"),{
+    onChangeText: function (jsonString) {
+      externalEditorPlain.updateText(jsonString);
+      $('.jsoneditor-format').trigger('click');
+    }
+  });
+  window.externalEditor = externalEditor;
+  var externalEditorPlain = new JSONEditor(document.getElementById("external-plain"), {
+    modes: ['code'],
+    onChangeText: function (jsonString) {
+      externalEditor.updateText(jsonString);
+    }
+  });
+  window.externalEditorPlain = externalEditorPlain;
+
+
+  var externalJSON = $("#external-editor-json").data("json");
+  externalEditor.set(externalJSON);
+  externalEditorPlain.set(externalJSON);
+  $('.jsoneditor-format').trigger('click');
+  $('.jsoneditor-expand-all').trigger('click');
+
+  window.compare = function compare(){
+    let internalJSON = window.internalJSON;
+    let externalJSON = window.externalEditor.get();
+    var delta = jsondiffpatch.diff(internalJSON, externalJSON);
+    document.getElementById('visual').innerHTML = jsondiffpatch.formatters.html.format(delta, externalJSON);
+    $("#compare-modal").modal();
+  }
+  window.seeComments = function seeComments(){
+    $("#comments-modal").modal();
+  }
+  window.saveExternal = function saveExternal(){
+    let url = location.href.replace("external-edit", "external-save");
+    let externalJSON = externalEditor.get();
+    $.post(url, externalJSON, (data) => {
+      if(data === "success"){
+        window.location.reload();
+      } else{
+        alert(data);
+      }
+    });
+  }
+
+  window.addComment = function addComment(){
+    let comment = $("#comment").val();
+    let issuer = $("#issuer").val();
+    let url = location.href.replace("external-edit", "external-save-comment");
+    $.post(url, {issuer, comment}, (data) => {
+      if(data === "success"){
+        window.location.reload();
+      } else{
+        alert(data);
+      }
+    });
+  }
+});
+
+</script>

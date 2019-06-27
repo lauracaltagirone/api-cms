@@ -11,6 +11,7 @@ var generator = require('generate-password');
 const bcrypt = require('bcrypt-nodejs');
 const nodemailer = require('nodemailer');
 const pause = require('../pause');
+const moment = require('moment');
 
 const httpStatus = [100,101,102,200,201,202,203,204,205,206,207,208,226,300,301,302,303,304,305,307,308,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,421,422,423,424,426,428,429,431,444,451,499,500,501,502,503,504,505,506,507,508,510,511,59];
 
@@ -318,11 +319,19 @@ router.post('/add-version', isLoggedInAndCMSAdmin, (req, res) => {
   let payload = req.body;
   let data = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${payload.project}/project.json`));
   let version =  uuidv1();
+  let externalEditHash = uuidv1();
 
 
   data.list.filter((api) => {
     if(api.id === payload.id){
-      api.versions.push({version, name: payload.name});
+      api.versions.push({
+        version,
+        name: payload.name,
+        externalEditHash,
+        externalNewEdit: false,
+        externalJSON: '{}',
+        comments: []
+      });
     }
   })
 
@@ -595,6 +604,90 @@ router.get('/search-by/:projectId/:what/:term', isLoggedInAndCMSAdmin,  (req, re
     fs.readFile(path.join(req.rootPath,`views/partials/apis.hbs`), 'utf8', (err, data) => {
       res.send({data: {project, template: data}});
     });
+});
+
+router.get('/external-edit/:projectId/:apiId/:externalEditHash', (req, res) => {
+  let projectId = req.params.projectId;
+  let externalEditHash = req.params.externalEditHash;
+  let apiId = req.params.apiId;
+  let project = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${projectId}/project.json`));
+  let versionFound = false;
+  project.list.filter((api) => {
+    if(api.id === apiId){
+      api.versions.filter((version) => {
+        if(version.externalEditHash === externalEditHash){
+          versionFound = true;
+          let versionJSON = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${projectId}/${apiId}/${version.version}.json`));
+          res.render('api-cms/external-edit', {
+            'versionJSON': JSON.stringify(versionJSON),
+            'externalJSON': version.externalJSON,
+            'versionName': version.name,
+            'apiName': api.name,
+            'projectName': project.name,
+            version,
+            'user': req.user
+          })
+        }
+      });
+    }
+  });
+  if(!versionFound){
+    res.send("Version not found");
+  }
+});
+
+router.post('/external-save/:projectId/:apiId/:externalEditHash', (req, res) => {
+  let json = req.body;
+  let projectId = req.params.projectId;
+  let externalEditHash = req.params.externalEditHash;
+  let apiId = req.params.apiId;
+  let project = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${projectId}/project.json`));
+  let versionFound = false;
+  project.list.filter((api) => {
+    if(api.id === apiId){
+      api.versions.filter((version) => {
+        if(version.externalEditHash === externalEditHash){
+          versionFound = true;
+          version.externalJSON = JSON.stringify(json);
+          version.externalNewEdit = true;
+          fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${projectId}/project.json`), JSON.stringify(project));
+          res.send("success");
+        }
+      });
+    }
+  });
+  if(!versionFound){
+    res.send("Version not found");
+  }
+});
+router.post('/external-save-comment/:projectId/:apiId/:externalEditHash', (req, res) => {
+  let comment = req.body.comment;
+  let issuer = req.body.issuer;
+  let projectId = req.params.projectId;
+  let externalEditHash = req.params.externalEditHash;
+  let apiId = req.params.apiId;
+  let project = fse.readJsonSync(path.join(req.rootPath, `api-cms-db/${projectId}/project.json`));
+  let versionFound = false;
+  project.list.filter((api) => {
+    if(api.id === apiId){
+      api.versions.filter((version) => {
+        if(version.externalEditHash === externalEditHash){
+          versionFound = true;
+          version.comments.push({
+            comment,
+            date: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+            issuer,
+            isInternal: req.user ? true : false
+          });
+          fse.outputFileSync(path.join(req.rootPath, `api-cms-db/${projectId}/project.json`), JSON.stringify(project));
+          res.send("success");
+        }
+      });
+    }
+  });
+  if(!versionFound){
+    res.send("Version not found");
+  }
 });
 
 function isLoggedInAndCMSAdmin(req, res, next) {
