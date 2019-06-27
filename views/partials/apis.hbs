@@ -14,7 +14,7 @@
             </div>
           {{/each}}
         </div>
-        <a data-toggle="collapse" href="#{{../../project.id}}_{{api.id}}">
+        <a data-toggle="collapse" href="#{{../../../project.id}}_{{api.id}}">
           <h3>{{api.name}}</h3>
         </a>
         <p class="api-hash hash" id="hash_{{api.id}}"><b>  API ID: &nbsp</b><i>{{api.id}}</i></p>
@@ -23,17 +23,17 @@
         {{#unless api.versions}}
           <span>This API has no versions yet.</span>
         {{/unless}}
-        <div class="collapse" id="{{../../project.id}}_{{api.id}}">
+        <div class="collapse" id="{{../../../project.id}}_{{api.id}}">
           <hr />
           <ul class="nav nav-pills versions">
             {{#each api.versions as |version|}}
-              <li class="{{#if (equals api.active_version version.version)}}active{{/if}} version"><a data-toggle="tab" href="#{{../../project.id}}_{{api.id}}_{{version.version}}">{{version.name}}</a></li>
+              <li class="{{#if (equals api.active_version version.version)}}active{{/if}} version"><a data-toggle="tab" href="#{{../../../project.id}}_{{api.id}}_{{version.version}}">{{version.name}}</a></li>
 
             {{/each}}
             <div class="tab-content">
               {{#each api.versions as |version|}}
 
-                <div id="{{../../project.id}}_{{api.id}}_{{version.version}}" class="tab-pane fade in {{#if (equals api.active_version version.version)}}active{{/if}}">
+                <div id="{{../../../project.id}}_{{api.id}}_{{version.version}}" class="tab-pane fade in {{#if (equals api.active_version version.version)}}active{{/if}}">
 
                   <p class="api-hash hash" id="hash_{{version.version}}"><b>  VERSION ID: &nbsp</b><i>{{version.version}}</i></p>
 
@@ -45,14 +45,14 @@
                     <textarea class="form-control" rows="5">{{version.json}}</textarea>
                   </div>
                   <div class="checkbox">
-                    <label><input type="checkbox" value="" onchange="app.setActiveVersion(this)" data-project="{{../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" {{#if (equals api.active_version version.version)}}
+                    <label><input type="checkbox" value="" onchange="app.setActiveVersion(this)" data-project="{{../../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" {{#if (equals api.active_version version.version)}}
                         checked{{/if}}>Active </label> </div>
 
-                      <button type="button" class="btn btn-primary btn-xs delete-version" data-project="{{../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.deleteVersion(this)">Delete
+                      <button type="button" class="btn btn-primary btn-xs delete-version" data-project="{{../../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.deleteVersion(this)">Delete
                       version</button>
 
-                      <button type="button" class="btn btn-primary btn-xs edit-version" data-qs="{{version.qs}}" data-version_name="{{version.name}}" data-project="{{../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.editVersion(this)">Edit version</button>
-                      <button type="button" class="btn btn-primary btn-xs save-json" data-project="{{../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.saveJSON(this)">Save JSON</button>
+                      <button type="button" class="btn btn-primary btn-xs edit-version" data-qs="{{version.qs}}" data-version_name="{{version.name}}" data-project="{{../../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.editVersion(this)">Edit version</button>
+                      <button type="button" class="btn btn-primary btn-xs save-json" data-project="{{../../../project.id}}" data-id="{{api.id}}" data-version="{{version.version}}" onclick="app.saveJSON(this)">Save JSON</button>
 
                   </div>
               {{/each}}
@@ -67,10 +67,10 @@
         {{/if}}
         <hr />
         <div class="">
-          <a class="active-link" href="/apicms/apis/{{../../project.id}}/{{api.id}}" target="_blank"><span class="glyphicon glyphicon glyphicon-link"></span> Go to API</a>
-          <a class="active-link" href="#" role="button" data-remove="{{api.id}}" data-project="{{../../project.id}}" onclick="app.deleteAPI(this)"><span class="glyphicon glyphicon glyphicon-remove"></span> Delete API</a>
-          <a class="active-link" href="#" role="button" data-id="{{api.id}}" data-name="{{api.name}}" data-project="{{../../project.id}}" onclick="app.addVersion(this)"><span class="glyphicon glyphicon glyphicon-plus"></span> Add version</a>
-          <a class="active-link" href="#" role="button" data-project="{{../../project.id}}" data-queryType="{{api.queryType}}" data-query="{{api.query}}" data-id="{{api.id}}" data-old-name="{{api.name}}" data-tags="{{tagsToString api.tags}}" data-status="{{api.status}}" data-delay="{{api.delay}}" onclick="app.editAPI(this)"><span class="glyphicon glyphicon glyphicon-edit"></span>
+          <a class="active-link" href="/apicms/apis/{{../../../project.id}}/{{api.id}}" target="_blank"><span class="glyphicon glyphicon glyphicon-link"></span> Go to API</a>
+          <a class="active-link" href="#" role="button" data-remove="{{api.id}}" data-project="{{../../../project.id}}" onclick="app.deleteAPI(this)"><span class="glyphicon glyphicon glyphicon-remove"></span> Delete API</a>
+          <a class="active-link" href="#" role="button" data-id="{{api.id}}" data-name="{{api.name}}" data-project="{{../../../project.id}}" onclick="app.addVersion(this)"><span class="glyphicon glyphicon glyphicon-plus"></span> Add version</a>
+          <a class="active-link" href="#" role="button" data-project="{{../../../project.id}}" data-queryType="{{api.queryType}}" data-query="{{api.query}}" data-id="{{api.id}}" data-old-name="{{api.name}}" data-tags="{{tagsToString api.tags}}" data-status="{{api.status}}" data-delay="{{api.delay}}" onclick="app.editAPI(this)"><span class="glyphicon glyphicon glyphicon-edit"></span>
             Edit API</a>
         </div>
 
