@@ -17,7 +17,7 @@ let i18n = require('i18n-express-4plugin')
 var sassMiddleware = require('node-sass-middleware');
 let cors = require('cors');
 
-var allowedOrigins = ["null", undefined, 'https://myaccount.newholland.local', 'myaccount.caseih.local', 'https://www.api.acz-core.com', 'http://192.168.1.84:8000', 'http://localhost:8000', 'http://localhost:3000', 'http://mybrand.pitchprototypes.eu', 'http://mybrand-dev.pitchprototypes.eu'];
+var allowedOrigins = ["null", undefined, 'https://myaccount.newholland.local', 'http://fcadashboard.pitchprototypes.eu', 'myaccount.caseih.local', 'https://www.api.acz-core.com', 'http://192.168.1.84:8000', 'http://localhost:8000', 'http://localhost:3000', 'http://mybrand.pitchprototypes.eu', 'http://mybrand-dev.pitchprototypes.eu'];
 
 
 
