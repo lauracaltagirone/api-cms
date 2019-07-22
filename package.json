@@ -1,6 +1,6 @@
 {
   "name": "api-cms",
-  "version": "1.0.49",
+  "version": "1.0.50",
   "description": "",
   "main": "api-cms.js",
   "scripts": {
