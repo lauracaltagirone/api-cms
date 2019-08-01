@@ -17,10 +17,6 @@ let i18n = require('i18n-express-4plugin')
 var sassMiddleware = require('node-sass-middleware');
 let cors = require('cors');
 
-var allowedOrigins = ["null", undefined, 'http://steyr-prod.pitchprototypes.eu', 'http://steyr-dev.pitchprototypes.eu','https://myaccount.newholland.local', 'http://fcadashboard.pitchprototypes.eu', 'myaccount.caseih.local', 'https://www.api.acz-core.com', 'http://192.168.1.84:8000', 'http://localhost:8000', 'http://localhost:3000', 'http://mybrand.pitchprototypes.eu', 'http://mybrand-dev.pitchprototypes.eu'];
-
-
-
 
 //Express app initialization
 let app = express()
@@ -29,6 +25,8 @@ app.use(cors({
   origin: function(origin, callback){
     // allow requests with no origin
     // (like mobile apps or curl requests)
+    console.log(origin);
+    let allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
     if(!origin) return callback(null, true);
     if(allowedOrigins.indexOf(origin) === -1){
       var msg = 'The CORS policy for this site does not ' +
