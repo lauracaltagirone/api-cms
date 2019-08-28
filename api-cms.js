@@ -99,7 +99,7 @@ app.use(flash()) // use connect-flash for flash messages stored in session
 
 let index = require('./routes/index')
 let apicms = require('./routes/apicms')
-
+let dve = require('./routes/dve')
 app.use(function(req, res, next) {
   req.rootPath = __dirname;
   next();
@@ -107,7 +107,7 @@ app.use(function(req, res, next) {
 
 app.use('/', index)
 app.use('/apicms', apicms)
-
+app.use('/dve', dve);
 
 
 app.get('*', (req, res, next) => {
