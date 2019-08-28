@@ -29,7 +29,7 @@ transporter.use('compile', hbs(options));
 router.post('/', (req, res) => {
   let mailOptions = {
     from: `no-reply@dainamicvisualeffects.com`,
-    to: "a.lovino@dainamicvisualeffects.com, s.zoitanu@dainamicvisualeffects.com",
+    to: "a.lovino@dainamicvisualeffects.com, s.zoitanu@dainamicvisualeffects.com, dainamicvisualeffects@gmail.com",
     subject: "Nuovo messaggio DVE",
     template: 'dve',
     layout: 'main',
