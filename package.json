@@ -27,7 +27,7 @@
     "i18n-express-4plugin": "^0.0.6",
     "install": "^0.12.2",
     "moment": "^2.24.0",
-    "mongodb": "^3.1.1",
+    "mongodb": "^3.1.13",
     "mongoose": "^5.2.7",
     "node-sass-middleware": "^0.11.0",
     "node-ssh": "^5.1.2",
