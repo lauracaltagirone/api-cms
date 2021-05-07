@@ -22,7 +22,7 @@
     "fs-extra": "^7.0.1",
     "generate-password": "^1.4.1",
     "get-folder-size": "^2.0.1",
-    "handlebars": "^4.0.12",
+    "handlebars": "^4.7.7",
     "hapi": "^17.5.2",
     "i18n-express-4plugin": "^0.0.6",
     "install": "^0.12.2",
