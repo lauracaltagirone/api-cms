@@ -26,7 +26,7 @@
     "hapi": "^17.5.2",
     "i18n-express-4plugin": "^0.0.6",
     "install": "^0.12.2",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "mongodb": "^3.1.1",
     "mongoose": "^5.2.7",
     "node-sass-middleware": "^0.11.0",
