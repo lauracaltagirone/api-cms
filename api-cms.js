@@ -14,7 +14,6 @@ let passport = require('passport')
 let bodyParser = require('body-parser')
 let flash = require('connect-flash')
 let i18n = require('i18n-express-4plugin')
-var sassMiddleware = require('node-sass-middleware');
 let cors = require('cors');
 
 
